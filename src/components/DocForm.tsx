@@ -74,7 +74,6 @@ export default function DocForm() {
     notifiedBodyCountry: '',
     legislation: [''],
     standards: [''],
-    standards: [''],
     certificateNumber: '',
     categoryClass: '',
   };
