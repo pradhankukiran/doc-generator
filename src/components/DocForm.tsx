@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { FileText, Plus, Trash2, Download, ArrowLeft } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { FileText, Plus, Trash2, Download, ArrowLeft, RefreshCw } from 'lucide-react';
 import { PDFViewer, Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({
@@ -51,32 +51,49 @@ const styles = StyleSheet.create({
 
 interface DocFormData {
   productName: string;
-  productCode: string;
-  serialNumber: string;
+  productCode: string[];
   brandName: string;
   manufacturerAddress: string;
-  notifiedBody: string;
-  notifiedBodyNumber: string;
   legislation: string[];
+  notifiedBodyAddress: string;
+  notifiedBodyZipCode: string;
+  notifiedBodyCountry: string;
   standards: string[];
-  supplementaryInfo: string;
+  certificateNumber: string;
+  categoryClass: string;
 }
 
 export default function DocForm() {
-  const [formData, setFormData] = useState<DocFormData>({
+  const initialFormData: DocFormData = {
     productName: '',
-    productCode: '',
-    serialNumber: '',
+    productCode: [''],
     brandName: '',
-    manufacturerAddress: '',
-    notifiedBody: '',
-    notifiedBodyNumber: '',
+    manufacturerAddress: 'Båstadgruppen AB\nFraktgatan 1\n262 73 Ängelholm\nSweden',
+    notifiedBodyAddress: '',
+    notifiedBodyZipCode: '',
+    notifiedBodyCountry: '',
     legislation: [''],
     standards: [''],
-    supplementaryInfo: '',
+    standards: [''],
+    certificateNumber: '',
+    categoryClass: '',
+  };
+
+  const [formData, setFormData] = useState<DocFormData>(() => {
+    const savedData = localStorage.getItem('docFormData');
+    return savedData ? JSON.parse(savedData) : initialFormData;
   });
 
   const [showPreview, setShowPreview] = useState(false);
+
+  const clearForm = () => {
+    setFormData(initialFormData);
+    localStorage.removeItem('docFormData');
+  };
+
+  useEffect(() => {
+    localStorage.setItem('docFormData', JSON.stringify(formData));
+  }, [formData]);
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
@@ -85,6 +102,29 @@ export default function DocForm() {
     setFormData((prev) => ({
       ...prev,
       [field]: e.target.value,
+    }));
+  };
+
+  const handleProductCodeChange = (index: number, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      productCode: prev.productCode.map((code, i) =>
+        i === index ? value : code
+      ),
+    }));
+  };
+
+  const addProductCode = () => {
+    setFormData((prev) => ({
+      ...prev,
+      productCode: [...prev.productCode, ''],
+    }));
+  };
+
+  const removeProductCode = (index: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      productCode: prev.productCode.filter((_, i) => i !== index),
     }));
   };
 
@@ -152,10 +192,22 @@ export default function DocForm() {
       {!showPreview ? (
         <form onSubmit={generateDoc} className="space-y-8 bg-white p-6 sm:p-8 rounded-lg shadow-lg border border-gray-200 mx-auto w-full max-w-2xl lg:max-w-none">
           <div>
-            <h2 className="text-lg font-medium text-gray-900">Product Information</h2>
-            <p className="mt-1 text-sm text-gray-500">
-              Enter the basic details about your product.
-            </p>
+            <div className="flex justify-between items-start">
+              <div>
+                <h2 className="text-lg font-medium text-gray-900">Product Information</h2>
+                <p className="mt-1 text-sm text-gray-500">
+                  Enter the basic details about your product.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={clearForm}
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <RefreshCw className="w-4 h-4" />
+                Clear Form
+              </button>
+            </div>
           </div>
           <div className="space-y-4">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -170,6 +222,7 @@ export default function DocForm() {
                   type="text"
                   id="productName"
                   required
+                  placeholder="Enter product name"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={formData.productName}
                   onChange={(e) => handleInputChange(e, 'productName')}
@@ -177,112 +230,84 @@ export default function DocForm() {
               </div>
 
               <div>
-                <label
-                  htmlFor="productCode"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Model/Type
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Product number
                 </label>
-                <input
-                  type="text"
-                  id="productCode"
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  value={formData.productCode}
-                  onChange={(e) => handleInputChange(e, 'productCode')}
-                />
+                <div className="space-y-2">
+                  {formData.productCode.map((code, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="text"
+                        required
+                        placeholder="Enter product number"
+                        className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        value={code}
+                        onChange={(e) =>
+                          handleProductCodeChange(index, e.target.value)
+                        }
+                      />
+                      {formData.productCode.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeProductCode(index)}
+                          className="p-2 text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addProductCode}
+                    className="inline-flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-700"
+                  >
+                    <Plus className="w-4 h-4" /> Add product number
+                  </button>
+                </div>
               </div>
-            </div>
-
-            <div>
-              <label
-                htmlFor="serialNumber"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Serial Number
-              </label>
-              <input
-                type="text"
-                id="serialNumber"
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                value={formData.serialNumber}
-                onChange={(e) => handleInputChange(e, 'serialNumber')}
-              />
             </div>
 
             <div>
               <h2 className="text-lg font-medium text-gray-900 mb-4">Manufacturer Details</h2>
             </div>
 
-            <div>
-              <label
-                htmlFor="brandName"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Manufacturer/Brand Name
-              </label>
-              <input
-                type="text"
-                id="brandName"
-                required
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                value={formData.brandName}
-                onChange={(e) => handleInputChange(e, 'brandName')}
-              />
-            </div>
-
-            <div>
-              <label
-                htmlFor="manufacturerAddress"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Manufacturer Address
-              </label>
-              <input
-                type="text"
-                id="manufacturerAddress"
-                required
-                placeholder="Full business address"
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                value={formData.manufacturerAddress}
-                onChange={(e) => handleInputChange(e, 'manufacturerAddress')}
-              />
-            </div>
-
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label
-                  htmlFor="notifiedBody"
+                  htmlFor="brandName"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Notified Body
+                  Manufacturer
                 </label>
-                <input
-                  type="text"
-                  id="notifiedBody"
-                  placeholder="If applicable"
+                <select
+                  id="brandName"
+                  required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  value={formData.notifiedBody}
-                  onChange={(e) => handleInputChange(e, 'notifiedBody')}
-                />
+                  value={formData.brandName}
+                  onChange={(e) => handleInputChange(e, 'brandName')}
+                >
+                  <option value="">Select manufacturer</option>
+                  <option value="Guardio">Guardio</option>
+                  <option value="Matterhorn">Matterhorn</option>
+                  <option value="Monitor">Monitor</option>
+                  <option value="Top Swede">Top Swede</option>
+                  <option value="South West">South West</option>
+                </select>
               </div>
-
+              
               <div>
                 <label
-                  htmlFor="notifiedBodyNumber"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Notified Body Number
+                  Manufacturer Address
                 </label>
-                <input
-                  type="text"
-                  id="notifiedBodyNumber"
-                  placeholder="If applicable"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  value={formData.notifiedBodyNumber}
-                  onChange={(e) => handleInputChange(e, 'notifiedBodyNumber')}
-                />
+                <div className="mt-1 p-3 bg-gray-50 rounded-md text-sm text-gray-700">
+                  Båstadgruppen AB<br />
+                  Fraktgatan 1<br />
+                  262 73 Ängelholm<br />
+                  Sweden
+                </div>
               </div>
             </div>
 
@@ -290,109 +315,187 @@ export default function DocForm() {
               <h2 className="text-lg font-medium text-gray-900 mb-4">Compliance Information</h2>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Relevant EU Legislation
-              </label>
-              <div className="space-y-2">
-                {formData.legislation.map((item, index) => (
-                  <div key={index} className="flex gap-2">
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g., Directive 2014/30/EU"
-                      className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      value={item}
-                      onChange={(e) =>
-                        handleLegislationChange(index, e.target.value)
-                      }
-                    />
-                    {formData.legislation.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeLegislation(index)}
-                        className="p-2 text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={addLegislation}
-                  className="inline-flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-700"
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label
+                  htmlFor="notifiedBodyAddress"
+                  className="block text-sm font-medium text-gray-700"
                 >
-                  <Plus className="w-4 h-4" /> Add EU Legislation
-                </button>
+                  Notified Body Address
+                </label>
+                <input
+                  type="text"
+                  id="notifiedBodyAddress"
+                  placeholder="Enter street address"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  value={formData.notifiedBodyAddress}
+                  onChange={(e) => handleInputChange(e, 'notifiedBodyAddress')}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="notifiedBodyZipCode"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Zip Code
+                </label>
+                <input
+                  type="text"
+                  id="notifiedBodyZipCode"
+                  placeholder="Enter zip code"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  value={formData.notifiedBodyZipCode}
+                  onChange={(e) => handleInputChange(e, 'notifiedBodyZipCode')}
+                />
+              </div>
+
+              <div>
+                <label
+                  htmlFor="notifiedBodyCountry"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Country
+                </label>
+                <input
+                  type="text"
+                  id="notifiedBodyCountry"
+                  placeholder="Enter country"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  value={formData.notifiedBodyCountry}
+                  onChange={(e) => handleInputChange(e, 'notifiedBodyCountry')}
+                />
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Harmonised Standards
-              </label>
-              <div className="space-y-2">
-                {formData.standards.map((standard, index) => (
-                  <div key={index} className="flex gap-2">
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g., EN 60950-1:2006"
-                      className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                      value={standard}
-                      onChange={(e) =>
-                        handleStandardChange(index, e.target.value)
-                      }
-                    />
-                    {formData.standards.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => removeStandard(index)}
-                        className="p-2 text-red-600 hover:text-red-700"
-                      >
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={addStandard}
-                  className="inline-flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-700"
-                >
-                  <Plus className="w-4 h-4" /> Add standard
-                </button>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Relevant EU Legislation
+                </label>
+                <div className="space-y-2">
+                  {formData.legislation.map((item, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="text"
+                        required
+                        placeholder="Enter EU legislation (e.g., Directive 2014/30/EU)"
+                        className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        value={item}
+                        onChange={(e) =>
+                          handleLegislationChange(index, e.target.value)
+                        }
+                      />
+                      {formData.legislation.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeLegislation(index)}
+                          className="p-2 text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addLegislation}
+                    className="inline-flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-700"
+                  >
+                    <Plus className="w-4 h-4" /> Add EU Legislation
+                  </button>
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Harmonised Standards
+                </label>
+                <div className="space-y-2">
+                  {formData.standards.map((standard, index) => (
+                    <div key={index} className="flex gap-2">
+                      <input
+                        type="text"
+                        required
+                        placeholder="Enter standard (e.g., EN 60950-1:2006)"
+                        className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        value={standard}
+                        onChange={(e) =>
+                          handleStandardChange(index, e.target.value)
+                        }
+                      />
+                      {formData.standards.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => removeStandard(index)}
+                          className="p-2 text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="w-5 h-5" />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={addStandard}
+                    className="inline-flex items-center gap-2 text-sm text-indigo-600 hover:text-indigo-700"
+                  >
+                    <Plus className="w-4 h-4" /> Add standard
+                  </button>
+                </div>
               </div>
             </div>
-
-            <div>
-              <label
-                htmlFor="supplementaryInfo"
-                className="block text-sm font-medium text-gray-700"
-              >
-                Supplementary Information
-              </label>
-              <textarea
-                id="supplementaryInfo"
-                rows={3}
-                className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                value={formData.supplementaryInfo}
-                onChange={(e) =>
-                  handleInputChange(e as any, 'supplementaryInfo')
-                }
-                placeholder="Any additional information (optional)"
-              />
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="certificateNumber"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Certificate Number
+                </label>
+                <input
+                  type="text"
+                  id="certificateNumber"
+                  placeholder="Enter certificate number"
+                  required
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  value={formData.certificateNumber}
+                  onChange={(e) => handleInputChange(e, 'certificateNumber')}
+                />
+              </div>
+              
+              <div>
+                <label
+                  htmlFor="categoryClass"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Category Class
+                </label>
+                <select
+                  id="categoryClass"
+                  required
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  value={formData.categoryClass}
+                  onChange={(e) => handleInputChange(e, 'categoryClass')}
+                >
+                  <option value="">Select category class</option>
+                  <option value="I">Class I</option>
+                  <option value="II">Class II</option>
+                  <option value="III">Class III</option>
+                </select>
+              </div>
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="w-full bg-indigo-600 text-white py-3 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200 text-sm font-medium flex items-center justify-center gap-2"
-          >
-            <FileText className="w-4 h-4" />
-            Generate Declaration
-          </button>
+          <div className="flex justify-center">
+            <button
+              type="submit"
+              className="w-64 bg-indigo-600 text-white py-3 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200 text-sm font-medium flex items-center justify-center gap-2"
+            >
+              <FileText className="w-4 h-4" />
+              Generate Declaration
+            </button>
+          </div>
         </form>
 
       ) : (
@@ -419,8 +522,9 @@ export default function DocForm() {
                   <View style={styles.section}>
                     <Text style={styles.heading}>2. Product Identification</Text>
                     <Text style={styles.text}>Product: {formData.productName}</Text>
-                    <Text style={styles.text}>Model/Type: {formData.productCode}</Text>
-                    <Text style={styles.text}>Serial Number: {formData.serialNumber}</Text>
+                    {formData.productCode.map((code, index) => 
+                      code && <Text key={index} style={styles.text}>Product number: {code}</Text>
+                    )}
                   </View>
 
                   <View style={styles.section}>
@@ -437,10 +541,11 @@ export default function DocForm() {
                     )}
                   </View>
 
-                  {formData.supplementaryInfo && (
+                  {formData.certificateNumber && (
                     <View style={styles.section}>
-                      <Text style={styles.heading}>6. Additional Information</Text>
-                      <Text style={styles.text}>{formData.supplementaryInfo}</Text>
+                      <Text style={styles.heading}>6. Certificate Number</Text>
+                      <Text style={styles.text}>{formData.certificateNumber}</Text>
+                      <Text style={styles.text}>Category Class: {formData.categoryClass}</Text>
                     </View>
                   )}
 
