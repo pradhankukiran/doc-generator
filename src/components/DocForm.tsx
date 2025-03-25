@@ -69,10 +69,11 @@ interface DocFormData {
   productCode: string[];
   brandName: string;
   manufacturerAddress: string;
-  legislation: string[];
+  notifiedBodyName: string;
   notifiedBodyAddress: string;
   notifiedBodyZipCode: string;
   notifiedBodyCountry: string;
+  legislation: string[];
   standards: string[];
   certificateNumber: string;
   categoryClass: string;
@@ -85,6 +86,7 @@ export default function DocForm() {
     brandName: "",
     manufacturerAddress:
       "Båstadgruppen AB\nFraktgatan 1\n262 73 Ängelholm\nSweden",
+    notifiedBodyName: "",
     notifiedBodyAddress: "",
     notifiedBodyZipCode: "",
     notifiedBodyCountry: "",
@@ -348,7 +350,24 @@ export default function DocForm() {
               </h2>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="notifiedBodyName"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Notified Body Name
+                </label>
+                <input
+                  type="text"
+                  id="notifiedBodyName"
+                  placeholder="Enter notified body name"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  value={formData.notifiedBodyName}
+                  onChange={(e) => handleInputChange(e, "notifiedBodyName")}
+                />
+              </div>
+
               <div>
                 <label
                   htmlFor="notifiedBodyAddress"
@@ -365,13 +384,15 @@ export default function DocForm() {
                   onChange={(e) => handleInputChange(e, "notifiedBodyAddress")}
                 />
               </div>
+            </div>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label
                   htmlFor="notifiedBodyZipCode"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Zip Code
+                  Notified Body Zip Code
                 </label>
                 <input
                   type="text"
@@ -388,7 +409,7 @@ export default function DocForm() {
                   htmlFor="notifiedBodyCountry"
                   className="block text-sm font-medium text-gray-700"
                 >
-                  Country
+                  Notified Body Country
                 </label>
                 <input
                   type="text"
@@ -606,6 +627,9 @@ export default function DocForm() {
                   {formData.certificateNumber && (
                     <View style={styles.section}>
                       <Text style={styles.heading}>6. Certificate Number</Text>
+                      <Text style={styles.text}>
+                        Notified Body: {formData.notifiedBodyName}
+                      </Text>
                       <Text style={styles.text}>
                         {formData.certificateNumber}
                       </Text>
