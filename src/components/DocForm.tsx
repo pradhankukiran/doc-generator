@@ -1,29 +1,44 @@
-import React, { useState, useEffect } from 'react';
-import { FileText, Plus, Trash2, Download, ArrowLeft, RefreshCw } from 'lucide-react';
-import { PDFViewer, Document, Page, Text, View, StyleSheet, Font } from '@react-pdf/renderer';
+import React, { useState, useEffect } from "react";
+import {
+  FileText,
+  Plus,
+  Trash2,
+  Download,
+  ArrowLeft,
+  RefreshCw,
+} from "lucide-react";
+import {
+  PDFViewer,
+  Document,
+  Page,
+  Text,
+  View,
+  StyleSheet,
+  Font,
+} from "@react-pdf/renderer";
 
 const styles = StyleSheet.create({
   page: {
     padding: 40,
-    fontFamily: 'Helvetica',
+    fontFamily: "Helvetica",
   },
   title: {
     fontSize: 24,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 20,
   },
   subtitle: {
     fontSize: 12,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 30,
-    color: '#666',
+    color: "#666",
   },
   section: {
     marginBottom: 20,
   },
   heading: {
     fontSize: 14,
-    fontWeight: 'bold',
+    fontWeight: "bold",
     marginBottom: 10,
   },
   text: {
@@ -43,9 +58,9 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingTop: 20,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: "#eee",
     fontSize: 10,
-    color: '#666',
+    color: "#666",
   },
 });
 
@@ -65,33 +80,43 @@ interface DocFormData {
 
 export default function DocForm() {
   const initialFormData: DocFormData = {
-    productName: '',
-    productCode: [''],
-    brandName: '',
-    manufacturerAddress: 'Båstadgruppen AB\nFraktgatan 1\n262 73 Ängelholm\nSweden',
-    notifiedBodyAddress: '',
-    notifiedBodyZipCode: '',
-    notifiedBodyCountry: '',
-    legislation: [''],
-    standards: [''],
-    certificateNumber: '',
-    categoryClass: '',
+    productName: "",
+    productCode: [""],
+    brandName: "",
+    manufacturerAddress:
+      "Båstadgruppen AB\nFraktgatan 1\n262 73 Ängelholm\nSweden",
+    notifiedBodyAddress: "",
+    notifiedBodyZipCode: "",
+    notifiedBodyCountry: "",
+    legislation: [""],
+    standards: [""],
+    certificateNumber: "",
+    categoryClass: "",
   };
 
   const [formData, setFormData] = useState<DocFormData>(() => {
-    const savedData = localStorage.getItem('docFormData');
-    return savedData ? JSON.parse(savedData) : initialFormData;
+    try {
+      const savedData = localStorage.getItem("docFormData");
+      return savedData ? JSON.parse(savedData) : initialFormData;
+    } catch (error) {
+      console.error("Error loading form data from localStorage:", error);
+      return initialFormData;
+    }
   });
 
   const [showPreview, setShowPreview] = useState(false);
 
   const clearForm = () => {
     setFormData(initialFormData);
-    localStorage.removeItem('docFormData');
+    localStorage.removeItem("docFormData");
   };
 
   useEffect(() => {
-    localStorage.setItem('docFormData', JSON.stringify(formData));
+    try {
+      localStorage.setItem("docFormData", JSON.stringify(formData));
+    } catch (error) {
+      console.error("Error saving form data to localStorage:", error);
+    }
   }, [formData]);
 
   const handleInputChange = (
@@ -116,7 +141,7 @@ export default function DocForm() {
   const addProductCode = () => {
     setFormData((prev) => ({
       ...prev,
-      productCode: [...prev.productCode, ''],
+      productCode: [...prev.productCode, ""],
     }));
   };
 
@@ -139,7 +164,7 @@ export default function DocForm() {
   const addStandard = () => {
     setFormData((prev) => ({
       ...prev,
-      standards: [...prev.standards, ''],
+      standards: [...prev.standards, ""],
     }));
   };
 
@@ -162,7 +187,7 @@ export default function DocForm() {
   const addLegislation = () => {
     setFormData((prev) => ({
       ...prev,
-      legislation: [...prev.legislation, ''],
+      legislation: [...prev.legislation, ""],
     }));
   };
 
@@ -179,21 +204,26 @@ export default function DocForm() {
   };
 
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: 'long',
-      year: 'numeric',
+    return date.toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
     });
   };
 
   return (
     <div className="container max-w-7xl mx-auto">
       {!showPreview ? (
-        <form onSubmit={generateDoc} className="space-y-8 bg-white p-6 sm:p-8 rounded-lg shadow-lg border border-gray-200 mx-auto w-full max-w-2xl lg:max-w-none">
+        <form
+          onSubmit={generateDoc}
+          className="space-y-8 bg-white p-6 sm:p-8 rounded-lg shadow-lg border border-gray-200 mx-auto w-full max-w-2xl lg:max-w-none"
+        >
           <div>
             <div className="flex justify-between items-start">
               <div>
-                <h2 className="text-lg font-medium text-gray-900">Product Information</h2>
+                <h2 className="text-lg font-medium text-gray-900">
+                  Product Information
+                </h2>
                 <p className="mt-1 text-sm text-gray-500">
                   Enter the basic details about your product.
                 </p>
@@ -224,7 +254,7 @@ export default function DocForm() {
                   placeholder="Enter product name"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={formData.productName}
-                  onChange={(e) => handleInputChange(e, 'productName')}
+                  onChange={(e) => handleInputChange(e, "productName")}
                 />
               </div>
 
@@ -268,7 +298,9 @@ export default function DocForm() {
             </div>
 
             <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Manufacturer Details</h2>
+              <h2 className="text-lg font-medium text-gray-900 mb-4">
+                Manufacturer Details
+              </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -284,7 +316,7 @@ export default function DocForm() {
                   required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={formData.brandName}
-                  onChange={(e) => handleInputChange(e, 'brandName')}
+                  onChange={(e) => handleInputChange(e, "brandName")}
                 >
                   <option value="">Select manufacturer</option>
                   <option value="Guardio">Guardio</option>
@@ -294,24 +326,26 @@ export default function DocForm() {
                   <option value="South West">South West</option>
                 </select>
               </div>
-              
+
               <div>
-                <label
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label className="block text-sm font-medium text-gray-700">
                   Manufacturer Address
                 </label>
                 <div className="mt-1 p-3 bg-gray-50 rounded-md text-sm text-gray-700">
-                  Båstadgruppen AB<br />
+                  Båstadgruppen AB
+                  <br />
                   Fraktgatan 1<br />
-                  262 73 Ängelholm<br />
+                  262 73 Ängelholm
+                  <br />
                   Sweden
                 </div>
               </div>
             </div>
 
             <div>
-              <h2 className="text-lg font-medium text-gray-900 mb-4">Compliance Information</h2>
+              <h2 className="text-lg font-medium text-gray-900 mb-4">
+                Compliance Information
+              </h2>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -328,7 +362,7 @@ export default function DocForm() {
                   placeholder="Enter street address"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={formData.notifiedBodyAddress}
-                  onChange={(e) => handleInputChange(e, 'notifiedBodyAddress')}
+                  onChange={(e) => handleInputChange(e, "notifiedBodyAddress")}
                 />
               </div>
 
@@ -345,7 +379,7 @@ export default function DocForm() {
                   placeholder="Enter zip code"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={formData.notifiedBodyZipCode}
-                  onChange={(e) => handleInputChange(e, 'notifiedBodyZipCode')}
+                  onChange={(e) => handleInputChange(e, "notifiedBodyZipCode")}
                 />
               </div>
 
@@ -362,7 +396,7 @@ export default function DocForm() {
                   placeholder="Enter country"
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={formData.notifiedBodyCountry}
-                  onChange={(e) => handleInputChange(e, 'notifiedBodyCountry')}
+                  onChange={(e) => handleInputChange(e, "notifiedBodyCountry")}
                 />
               </div>
             </div>
@@ -443,7 +477,7 @@ export default function DocForm() {
                 </div>
               </div>
             </div>
-            
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label
@@ -459,10 +493,10 @@ export default function DocForm() {
                   required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={formData.certificateNumber}
-                  onChange={(e) => handleInputChange(e, 'certificateNumber')}
+                  onChange={(e) => handleInputChange(e, "certificateNumber")}
                 />
               </div>
-              
+
               <div>
                 <label
                   htmlFor="categoryClass"
@@ -475,7 +509,7 @@ export default function DocForm() {
                   required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={formData.categoryClass}
-                  onChange={(e) => handleInputChange(e, 'categoryClass')}
+                  onChange={(e) => handleInputChange(e, "categoryClass")}
                 >
                   <option value="">Select category class</option>
                   <option value="I">Class I</option>
@@ -496,7 +530,6 @@ export default function DocForm() {
             </button>
           </div>
         </form>
-
       ) : (
         <div className="w-full">
           <button
@@ -505,65 +538,107 @@ export default function DocForm() {
           >
             <ArrowLeft className="w-4 h-4" /> Back to Form
           </button>
-          <div className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden" style={{ height: 'calc(100vh - 120px)' }}>
-            <PDFViewer style={{ width: '100%', height: '100%' }}>
+          <div
+            className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden"
+            style={{ height: "calc(100vh - 120px)" }}
+          >
+            <PDFViewer style={{ width: "100%", height: "100%" }}>
               <Document>
                 <Page size="A4" style={styles.page}>
                   <Text style={styles.title}>EU Declaration of Conformity</Text>
-                  <Text style={styles.subtitle}>In accordance with ISO/IEC 17050-1</Text>
-                  
+                  <Text style={styles.subtitle}>
+                    In accordance with ISO/IEC 17050-1
+                  </Text>
+
                   <View style={styles.section}>
                     <Text style={styles.heading}>1. Manufacturer</Text>
                     <Text style={styles.text}>{formData.brandName}</Text>
-                    <Text style={styles.text}>{formData.manufacturerAddress}</Text>
+                    <Text style={styles.text}>
+                      {formData.manufacturerAddress}
+                    </Text>
                   </View>
 
                   <View style={styles.section}>
-                    <Text style={styles.heading}>2. Product Identification</Text>
-                    <Text style={styles.text}>Product: {formData.productName}</Text>
-                    {formData.productCode.map((code, index) => 
-                      code && <Text key={index} style={styles.text}>Product number: {code}</Text>
+                    <Text style={styles.heading}>
+                      2. Product Identification
+                    </Text>
+                    <Text style={styles.text}>
+                      Product: {formData.productName}
+                    </Text>
+                    {formData.productCode.map(
+                      (code, index) =>
+                        code && (
+                          <Text key={index} style={styles.text}>
+                            Product number: {code}
+                          </Text>
+                        )
                     )}
                   </View>
 
                   <View style={styles.section}>
-                    <Text style={styles.heading}>4. Relevant EU Legislation</Text>
-                    {formData.legislation.map((item, index) => 
-                      item && <Text key={index} style={styles.text}>• {item}</Text>
+                    <Text style={styles.heading}>
+                      4. Relevant EU Legislation
+                    </Text>
+                    {formData.legislation.map(
+                      (item, index) =>
+                        item && (
+                          <Text key={index} style={styles.text}>
+                            • {item}
+                          </Text>
+                        )
                     )}
                   </View>
 
                   <View style={styles.section}>
-                    <Text style={styles.heading}>5. References to Harmonised Standards</Text>
-                    {formData.standards.map((standard, index) => 
-                      standard && <Text key={index} style={styles.text}>• {standard}</Text>
+                    <Text style={styles.heading}>
+                      5. References to Harmonised Standards
+                    </Text>
+                    {formData.standards.map(
+                      (standard, index) =>
+                        standard && (
+                          <Text key={index} style={styles.text}>
+                            • {standard}
+                          </Text>
+                        )
                     )}
                   </View>
 
                   {formData.certificateNumber && (
                     <View style={styles.section}>
                       <Text style={styles.heading}>6. Certificate Number</Text>
-                      <Text style={styles.text}>{formData.certificateNumber}</Text>
-                      <Text style={styles.text}>Category Class: {formData.categoryClass}</Text>
+                      <Text style={styles.text}>
+                        {formData.certificateNumber}
+                      </Text>
+                      <Text style={styles.text}>
+                        Category Class: {formData.categoryClass}
+                      </Text>
                     </View>
                   )}
 
                   <View style={styles.section}>
                     <Text style={styles.heading}>Declaration</Text>
                     <Text style={styles.declaration}>
-                      I hereby declare that the product described above complies with the relevant Union harmonisation legislation and standards listed above. This declaration of conformity is issued under the sole responsibility of the manufacturer.
+                      I hereby declare that the product described above complies
+                      with the relevant Union harmonisation legislation and
+                      standards listed above. This declaration of conformity is
+                      issued under the sole responsibility of the manufacturer.
                     </Text>
                   </View>
 
                   <View style={styles.signature}>
-                    <Text style={styles.heading}>Signed for and on behalf of:</Text>
+                    <Text style={styles.heading}>
+                      Signed for and on behalf of:
+                    </Text>
                     <Text style={styles.text}>{formData.brandName}</Text>
-                    <Text style={styles.text}>Date: {formatDate(new Date())}</Text>
+                    <Text style={styles.text}>
+                      Date: {formatDate(new Date())}
+                    </Text>
                   </View>
 
                   <View style={styles.footer}>
                     <Text>
-                      This document must be kept for a period of 10 years from the date the product was placed on the market.
+                      This document must be kept for a period of 10 years from
+                      the date the product was placed on the market.
                     </Text>
                   </View>
                 </Page>
