@@ -97,6 +97,7 @@ interface DocFormData {
   brandName: string;
   manufacturerAddress: string;
   notifiedBodyName: string;
+  notifiedBodyNumber: string;
   notifiedBodyAddress: string;
   notifiedBodyZipCode: string;
   notifiedBodyCountry: string;
@@ -157,7 +158,7 @@ const DocPDF = React.memo(({ formData }: { formData: DocFormData }) => {
           {formData.notifiedBodyName}
         </PDFText>
         <PDFText style={styles.text}>
-          Notified Body No. {formData.certificateNumber}
+          Notified Body No. {formData.notifiedBodyNumber}
         </PDFText>
         <PDFText style={styles.text}>{formData.notifiedBodyAddress}</PDFText>
         <PDFText style={styles.text}>
@@ -188,6 +189,7 @@ export default function DocForm() {
     manufacturerAddress:
       "Båstadgruppen AB\nFraktgatan 1\n262 73 Ängelholm\nSweden",
     notifiedBodyName: "",
+    notifiedBodyNumber: "",
     notifiedBodyAddress: "",
     notifiedBodyZipCode: "",
     notifiedBodyCountry: "",
@@ -224,6 +226,16 @@ export default function DocForm() {
 
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement>,
+    field: keyof DocFormData
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: e.target.value,
+    }));
+  };
+
+  const handleSelectChange = (
+    e: React.ChangeEvent<HTMLSelectElement>,
     field: keyof DocFormData
   ) => {
     setFormData((prev) => ({
@@ -411,7 +423,7 @@ export default function DocForm() {
                   required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={formData.brandName}
-                  onChange={(e) => handleInputChange(e, "brandName")}
+                  onChange={(e) => handleSelectChange(e, "brandName")}
                 >
                   <option value="">Select manufacturer</option>
                   <option value="Guardio">Guardio</option>
@@ -463,6 +475,25 @@ export default function DocForm() {
 
               <div>
                 <label
+                  htmlFor="notifiedBodyNumber"
+                  className="block text-sm font-medium text-gray-700"
+                >
+                  Notified Body Number
+                </label>
+                <input
+                  type="text"
+                  id="notifiedBodyNumber"
+                  placeholder="Enter notified body number"
+                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                  value={formData.notifiedBodyNumber}
+                  onChange={(e) => handleInputChange(e, "notifiedBodyNumber")}
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label
                   htmlFor="notifiedBodyAddress"
                   className="block text-sm font-medium text-gray-700"
                 >
@@ -477,9 +508,7 @@ export default function DocForm() {
                   onChange={(e) => handleInputChange(e, "notifiedBodyAddress")}
                 />
               </div>
-            </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label
                   htmlFor="notifiedBodyZipCode"
@@ -623,7 +652,7 @@ export default function DocForm() {
                   required
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                   value={formData.categoryClass}
-                  onChange={(e) => handleInputChange(e, "categoryClass")}
+                  onChange={(e) => handleSelectChange(e, "categoryClass")}
                 >
                   <option value="">Select category class</option>
                   <option value="I">Class I</option>
