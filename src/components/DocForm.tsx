@@ -1,66 +1,93 @@
 import React, { useState, useEffect } from "react";
-import {
-  FileText,
-  Plus,
-  Trash2,
-  Download,
-  ArrowLeft,
-  RefreshCw,
-} from "lucide-react";
+import { FileText, Plus, Trash2, ArrowLeft, RefreshCw } from "lucide-react";
 import {
   PDFViewer,
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
+  Document as PDFDocument,
+  Page as PDFPage,
+  Text as PDFText,
+  View as PDFView,
+  StyleSheet as PDFStyleSheet,
+  Image as PDFImage,
   Font,
 } from "@react-pdf/renderer";
 
-const styles = StyleSheet.create({
+const useImage = (path: string) => {
+  const [image, setImage] = useState<string>("");
+
+  useEffect(() => {
+    fetch(path)
+      .then((response) => response.text())
+      .then((text) => {
+        const base64 = btoa(text);
+        setImage(`data:image/svg+xml;base64,${base64}`);
+      })
+      .catch((error) => console.error("Error loading image:", error));
+  }, [path]);
+
+  return image;
+};
+
+const formatDate = (date: Date) => {
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+};
+
+const styles = PDFStyleSheet.create({
   page: {
-    padding: 40,
+    padding: 50,
     fontFamily: "Helvetica",
   },
-  title: {
-    fontSize: 24,
-    textAlign: "center",
-    marginBottom: 20,
+  logo: {
+    width: 200,
+    marginBottom: 40,
   },
-  subtitle: {
-    fontSize: 12,
-    textAlign: "center",
-    marginBottom: 30,
-    color: "#666",
+  title: {
+    fontSize: 16,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  category: {
+    fontSize: 14,
+    color: "#e65100",
+    marginBottom: 25,
   },
   section: {
     marginBottom: 20,
   },
-  heading: {
-    fontSize: 14,
-    fontWeight: "bold",
+  text: {
+    fontSize: 11,
     marginBottom: 10,
   },
-  text: {
-    fontSize: 12,
-    marginBottom: 5,
-    paddingLeft: 15,
+  brandLogo: {
+    width: 150,
+    marginVertical: 20,
+    alignSelf: "center",
   },
   declaration: {
-    fontSize: 12,
+    fontSize: 11,
     marginTop: 20,
     marginBottom: 20,
   },
   signature: {
-    marginTop: 40,
+    marginTop: 60,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "flex-end",
   },
-  footer: {
-    marginTop: 20,
-    paddingTop: 20,
-    borderTopWidth: 1,
-    borderTopColor: "#eee",
-    fontSize: 10,
-    color: "#666",
+  signatureImage: {
+    width: 100,
+    height: 50,
+  },
+  signatureSection: {
+    alignItems: "flex-start",
+  },
+  websiteLink: {
+    fontSize: 11,
+    color: "#0066cc",
+    textDecoration: "underline",
   },
 });
 
@@ -78,6 +105,80 @@ interface DocFormData {
   certificateNumber: string;
   categoryClass: string;
 }
+
+const DocPDF = React.memo(({ formData }: { formData: DocFormData }) => {
+  const logo = useImage("/logo.svg");
+  const brandLogo = useImage("/brands/guardio.svg");
+  const signature = useImage("/signature.svg");
+
+  if (!logo || !brandLogo || !signature) {
+    return null;
+  }
+
+  return (
+    <PDFDocument>
+      <PDFPage size="A4" style={styles.page}>
+        <PDFImage src={logo} style={styles.logo} />
+        <PDFText style={styles.title}>EU Declaration of Conformity</PDFText>
+        <PDFText style={styles.category}>
+          Category {formData.categoryClass}
+        </PDFText>
+        <PDFText style={styles.text}>
+          This declaration of conformity is issued under the sole responsibility
+          of the manufacturer:
+        </PDFText>
+        <PDFText style={styles.text}>Båstadgruppen AB</PDFText>
+        <PDFText style={styles.text}>Fraktgatan 1</PDFText>
+        <PDFText style={styles.text}>262 73 Ängelholm</PDFText>
+        <PDFText style={styles.text}>Sweden</PDFText>
+        <PDFText style={[styles.text, { marginTop: 20 }]}>
+          The manufacturer hereby declares that the below-described Personal
+          Protective Equipment (PPE):
+        </PDFText>
+        <PDFImage src={brandLogo} style={styles.brandLogo} />
+        <PDFText
+          style={[styles.text, { fontWeight: "bold", textAlign: "center" }]}
+        >
+          {formData.productName}
+        </PDFText>
+        <PDFText style={[styles.text, { textAlign: "center" }]}>
+          with item number {formData.productCode[0]}
+        </PDFText>
+        <PDFText style={[styles.text, { marginTop: 20 }]}>
+          Is in conformity with the relevant Union harmonisation legislation:{" "}
+          {formData.legislation[0]}, and the relevant harmonized standards No.:{" "}
+          {formData.standards.join(", ")}
+        </PDFText>
+        <PDFText style={[styles.text, { marginTop: 20 }]}>
+          EU type-examination certificate (Module B) and issued the EU
+          type-examination certificate No. {formData.certificateNumber}
+        </PDFText>
+        <PDFText style={[styles.text, { marginTop: 20 }]}>
+          {formData.notifiedBodyName}
+        </PDFText>
+        <PDFText style={styles.text}>
+          Notified Body No. {formData.certificateNumber}
+        </PDFText>
+        <PDFText style={styles.text}>{formData.notifiedBodyAddress}</PDFText>
+        <PDFText style={styles.text}>
+          {formData.notifiedBodyZipCode} {formData.notifiedBodyCountry}
+        </PDFText>
+        <PDFView style={styles.signature}>
+          <PDFView>
+            <PDFText style={styles.websiteLink}>www.bastadgruppen.com</PDFText>
+            <PDFText style={styles.text}>Båstadgruppen AB</PDFText>
+          </PDFView>
+          <PDFView style={styles.signatureSection}>
+            <PDFImage src={signature} style={styles.signatureImage} />
+            <PDFText style={styles.text}>Product Manager Safety</PDFText>
+            <PDFText style={styles.text}>Anders Andersson</PDFText>
+            <PDFText style={styles.text}>{formatDate(new Date())}</PDFText>
+          </PDFView>
+        </PDFView>
+      </PDFPage>
+    </PDFDocument>
+  );
+});
 
 export default function DocForm() {
   const initialFormData: DocFormData = {
@@ -203,14 +304,6 @@ export default function DocForm() {
   const generateDoc = (e: React.FormEvent) => {
     e.preventDefault();
     setShowPreview(true);
-  };
-
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString("en-GB", {
-      day: "2-digit",
-      month: "long",
-      year: "numeric",
-    });
   };
 
   return (
@@ -563,110 +656,11 @@ export default function DocForm() {
             className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden"
             style={{ height: "calc(100vh - 120px)" }}
           >
-            <PDFViewer style={{ width: "100%", height: "100%" }}>
-              <Document>
-                <Page size="A4" style={styles.page}>
-                  <Text style={styles.title}>EU Declaration of Conformity</Text>
-                  <Text style={styles.subtitle}>
-                    In accordance with ISO/IEC 17050-1
-                  </Text>
-
-                  <View style={styles.section}>
-                    <Text style={styles.heading}>1. Manufacturer</Text>
-                    <Text style={styles.text}>{formData.brandName}</Text>
-                    <Text style={styles.text}>
-                      {formData.manufacturerAddress}
-                    </Text>
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.heading}>
-                      2. Product Identification
-                    </Text>
-                    <Text style={styles.text}>
-                      Product: {formData.productName}
-                    </Text>
-                    {formData.productCode.map(
-                      (code, index) =>
-                        code && (
-                          <Text key={index} style={styles.text}>
-                            Product number: {code}
-                          </Text>
-                        )
-                    )}
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.heading}>
-                      4. Relevant EU Legislation
-                    </Text>
-                    {formData.legislation.map(
-                      (item, index) =>
-                        item && (
-                          <Text key={index} style={styles.text}>
-                            • {item}
-                          </Text>
-                        )
-                    )}
-                  </View>
-
-                  <View style={styles.section}>
-                    <Text style={styles.heading}>
-                      5. References to Harmonised Standards
-                    </Text>
-                    {formData.standards.map(
-                      (standard, index) =>
-                        standard && (
-                          <Text key={index} style={styles.text}>
-                            • {standard}
-                          </Text>
-                        )
-                    )}
-                  </View>
-
-                  {formData.certificateNumber && (
-                    <View style={styles.section}>
-                      <Text style={styles.heading}>6. Certificate Number</Text>
-                      <Text style={styles.text}>
-                        Notified Body: {formData.notifiedBodyName}
-                      </Text>
-                      <Text style={styles.text}>
-                        {formData.certificateNumber}
-                      </Text>
-                      <Text style={styles.text}>
-                        Category Class: {formData.categoryClass}
-                      </Text>
-                    </View>
-                  )}
-
-                  <View style={styles.section}>
-                    <Text style={styles.heading}>Declaration</Text>
-                    <Text style={styles.declaration}>
-                      I hereby declare that the product described above complies
-                      with the relevant Union harmonisation legislation and
-                      standards listed above. This declaration of conformity is
-                      issued under the sole responsibility of the manufacturer.
-                    </Text>
-                  </View>
-
-                  <View style={styles.signature}>
-                    <Text style={styles.heading}>
-                      Signed for and on behalf of:
-                    </Text>
-                    <Text style={styles.text}>{formData.brandName}</Text>
-                    <Text style={styles.text}>
-                      Date: {formatDate(new Date())}
-                    </Text>
-                  </View>
-
-                  <View style={styles.footer}>
-                    <Text>
-                      This document must be kept for a period of 10 years from
-                      the date the product was placed on the market.
-                    </Text>
-                  </View>
-                </Page>
-              </Document>
+            <PDFViewer
+              style={{ width: "100%", height: "100%" }}
+              showToolbar={false}
+            >
+              <DocPDF formData={formData} />
             </PDFViewer>
           </div>
         </div>
