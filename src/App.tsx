@@ -8,7 +8,7 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <h1 className="text-xl font-semibold text-gray-900">DoC Generator | Båstadgruppen AB</h1>
           <img
-            src="/logo.svg"
+            src="/logo.png"
             alt="Company Logo"
             className="h-12 w-auto"
           />

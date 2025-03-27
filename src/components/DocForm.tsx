@@ -1,30 +1,45 @@
-import React, { useState, useEffect } from "react";
-import { FileText, Plus, Trash2, ArrowLeft, RefreshCw } from "lucide-react";
-import {
-  PDFViewer,
-  Document as PDFDocument,
-  Page as PDFPage,
-  Text as PDFText,
-  View as PDFView,
-  StyleSheet as PDFStyleSheet,
-  Image as PDFImage,
-  Font,
-} from "@react-pdf/renderer";
+import React, { useState, useEffect, useRef } from "react";
+import { FileText, Plus, Trash2, ArrowLeft, RefreshCw, Download } from "lucide-react";
 
 const useImage = (path: string) => {
   const [image, setImage] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(false);
 
   useEffect(() => {
+    if (!path) {
+      setIsLoading(false);
+      setError(true);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(false);
+
     fetch(path)
-      .then((response) => response.text())
-      .then((text) => {
-        const base64 = btoa(text);
-        setImage(`data:image/svg+xml;base64,${base64}`);
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const blob = await response.blob();
+        return new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(blob);
+        });
       })
-      .catch((error) => console.error("Error loading image:", error));
+      .then((dataUrl) => {
+        setImage(dataUrl);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error loading image:", error);
+        setError(true);
+        setIsLoading(false);
+      });
   }, [path]);
 
-  return image;
+  return { image, isLoading, error };
 };
 
 const formatDate = (date: Date) => {
@@ -35,66 +50,11 @@ const formatDate = (date: Date) => {
   });
 };
 
-const styles = PDFStyleSheet.create({
-  page: {
-    padding: 50,
-    fontFamily: "Helvetica",
-  },
-  logo: {
-    width: 200,
-    marginBottom: 40,
-  },
-  title: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  category: {
-    fontSize: 14,
-    color: "#e65100",
-    marginBottom: 25,
-  },
-  section: {
-    marginBottom: 20,
-  },
-  text: {
-    fontSize: 11,
-    marginBottom: 10,
-  },
-  brandLogo: {
-    width: 150,
-    marginVertical: 20,
-    alignSelf: "center",
-  },
-  declaration: {
-    fontSize: 11,
-    marginTop: 20,
-    marginBottom: 20,
-  },
-  signature: {
-    marginTop: 60,
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "flex-end",
-  },
-  signatureImage: {
-    width: 100,
-    height: 50,
-  },
-  signatureSection: {
-    alignItems: "flex-start",
-  },
-  websiteLink: {
-    fontSize: 11,
-    color: "#0066cc",
-    textDecoration: "underline",
-  },
-});
-
 interface DocFormData {
   productName: string;
   productCode: string[];
   brandName: string;
+  brandLogo: string;
   manufacturerAddress: string;
   notifiedBodyName: string;
   notifiedBodyNumber: string;
@@ -107,85 +67,159 @@ interface DocFormData {
   categoryClass: string;
 }
 
-const DocPDF = React.memo(({ formData }: { formData: DocFormData }) => {
-  const logo = useImage("/logo.svg");
-  const brandLogo = useImage("/brands/guardio.svg");
-  const signature = useImage("/signature.svg");
+const DocumentPreview = ({ formData, setShowPreview }: { formData: DocFormData, setShowPreview: (show: boolean) => void }) => {
+  const { image: brandLogo, isLoading: brandLogoLoading, error: brandLogoError } = useImage(formData.brandLogo);
+  const showBrandLogo = !brandLogoLoading && !brandLogoError && brandLogo;
+  const documentRef = useRef<HTMLDivElement>(null);
+  
+  // Map brand names to signature files and person names
+  const signatureMap: Record<string, { file: string, name: string }> = {
+    'Guardio': { file: '/signatures/Nawar.png', name: 'Nawar Toma' },
+    'Matterhorn': { file: '/signatures/Catrin.png', name: 'Catrin Ogenvall' },
+    'Monitor': { file: '/signatures/Ove.png', name: 'Ove Nilsson' },
+    'Top Swede': { file: '/signatures/Kristin.png', name: 'Kristin Hallbäck' },
+    'South West': { file: '/signatures/Helena.png', name: 'Helena Rydberg' }
+  };
+  
+  // Get the signature data based on the selected brand
+  const signatureData = formData.brandName ? signatureMap[formData.brandName] : null;
+  
+  // Load the signature image if applicable
+  const { image: signatureImage, isLoading: signatureLoading, error: signatureError } = 
+    useImage(signatureData ? signatureData.file : '');
+  
+  const showSignature = !signatureLoading && !signatureError && signatureImage && signatureData;
 
-  if (!logo || !brandLogo || !signature) {
-    return null;
-  }
+  const handlePrint = () => {
+    window.print();
+  };
+
+  const handleDownloadPDF = async () => {
+    if (!documentRef.current) return;
+    
+    // Dynamically import html2pdf to avoid server-side issues
+    const html2pdf = (await import('html2pdf.js')).default;
+    
+    const element = documentRef.current;
+    const opt = {
+      margin: 10,
+      filename: `${formData.brandName || 'Bastadgruppen'}_Declaration_${new Date().toISOString().split('T')[0]}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+    };
+    
+    html2pdf().set(opt).from(element).save();
+  };
 
   return (
-    <PDFDocument>
-      <PDFPage size="A4" style={styles.page}>
-        <PDFImage src={logo} style={styles.logo} />
-        <PDFText style={styles.title}>EU Declaration of Conformity</PDFText>
-        <PDFText style={styles.category}>
-          Category {formData.categoryClass}
-        </PDFText>
-        <PDFText style={styles.text}>
+    <div className="p-8 bg-white h-full overflow-auto">
+      <div className="mb-4 flex justify-between">
+        <button
+          onClick={() => setShowPreview(false)}
+          className="bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Form
+        </button>
+        <button
+          onClick={handleDownloadPDF}
+          className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
+        >
+          <Download className="w-4 h-4" />
+          Download PDF
+        </button>
+      </div>
+      <div ref={documentRef} className="max-w-2xl mx-auto print:border-0 print:shadow-none">
+        <div className="flex justify-end mb-6">
+          <img src="/logo.png" alt="Båstadgruppen Logo" className="h-14" />
+        </div>
+        <div className="flex">
+          <div className="w-8 bg-black h-12 mr-4"></div>
+          <div>
+            <h1 className="text-2xl font-bold">EU Declaration of Conformity</h1>
+            <p className="font-medium">Category {formData.categoryClass || 'II'}</p>
+          </div>
+        </div>
+        
+        <p className="my-6">
           This declaration of conformity is issued under the sole responsibility
           of the manufacturer:
-        </PDFText>
-        <PDFText style={styles.text}>Båstadgruppen AB</PDFText>
-        <PDFText style={styles.text}>Fraktgatan 1</PDFText>
-        <PDFText style={styles.text}>262 73 Ängelholm</PDFText>
-        <PDFText style={styles.text}>Sweden</PDFText>
-        <PDFText style={[styles.text, { marginTop: 20 }]}>
-          The manufacturer hereby declares that the below-described Personal
-          Protective Equipment (PPE):
-        </PDFText>
-        <PDFImage src={brandLogo} style={styles.brandLogo} />
-        <PDFText
-          style={[styles.text, { fontWeight: "bold", textAlign: "center" }]}
-        >
-          {formData.productName}
-        </PDFText>
-        <PDFText style={[styles.text, { textAlign: "center" }]}>
-          with item number {formData.productCode[0]}
-        </PDFText>
-        <PDFText style={[styles.text, { marginTop: 20 }]}>
-          Is in conformity with the relevant Union harmonisation legislation:{" "}
-          {formData.legislation[0]}, and the relevant harmonized standards No.:{" "}
-          {formData.standards.join(", ")}
-        </PDFText>
-        <PDFText style={[styles.text, { marginTop: 20 }]}>
+        </p>
+        
+        <p className="mb-1">Båstadgruppen AB</p>
+        <p className="mb-1">Fraktgatan 1</p>
+        <p className="mb-1">262 73 Ängelholm</p>
+        <p className="mb-6">Sweden</p>
+
+        <div className="my-8 text-center">
+          <p className="mb-4">
+            The manufacturer hereby declares that the<br />
+            below-described Personal Protective Equipment (PPE):
+          </p>
+          
+          {showBrandLogo && (
+            <div className="flex justify-center my-6">
+              <img src={brandLogo} alt="Brand Logo" className="h-16" />
+            </div>
+          )}
+          
+          <p className="font-bold text-xl my-3">{formData.productName || 'Armet Safety Helmet'}</p>
+          <p className="mb-6">with item number {formData.productCode[0] || '1001933'}</p>
+        </div>
+
+        <p className="mb-4">
+          Is in conformity with the relevant Union harmonisation legislation: {formData.legislation[0] || 'Regulation (EU) 2016/425'} - 
+          and the relevant harmonized standards No.: {formData.standards.join(", ") || 'EN ISO 21420: 2020, EN 388:2016 + A1:2018 M.'}
+        </p>
+        
+        <p className="mb-4">
+          Is certified to be washed according to EN ISO 21420: General requirements
+          (40°C/104°F -3 washing cycles)
+        </p>
+        
+        <p className="mb-6">
           EU type-examination certificate (Module B) and issued the EU
-          type-examination certificate No. {formData.certificateNumber}
-        </PDFText>
-        <PDFText style={[styles.text, { marginTop: 20 }]}>
-          {formData.notifiedBodyName}
-        </PDFText>
-        <PDFText style={styles.text}>
-          Notified Body No. {formData.notifiedBodyNumber}
-        </PDFText>
-        <PDFText style={styles.text}>{formData.notifiedBodyAddress}</PDFText>
-        <PDFText style={styles.text}>
-          {formData.notifiedBodyZipCode} {formData.notifiedBodyCountry}
-        </PDFText>
-        <PDFView style={styles.signature}>
-          <PDFView>
-            <PDFText style={styles.websiteLink}>www.bastadgruppen.com</PDFText>
-            <PDFText style={styles.text}>Båstadgruppen AB</PDFText>
-          </PDFView>
-          <PDFView style={styles.signatureSection}>
-            <PDFImage src={signature} style={styles.signatureImage} />
-            <PDFText style={styles.text}>Product Manager Safety</PDFText>
-            <PDFText style={styles.text}>Anders Andersson</PDFText>
-            <PDFText style={styles.text}>{formatDate(new Date())}</PDFText>
-          </PDFView>
-        </PDFView>
-      </PDFPage>
-    </PDFDocument>
+          type-examination certificate No. {formData.certificateNumber || 'BP 60132703'}
+        </p>
+
+        <p className="mb-1">{formData.notifiedBodyName || "SGS Fimko Ltd."}</p>
+        <p className="mb-1">Notified Body No. {formData.notifiedBodyNumber || "0598"}</p>
+        <p className="mb-1">{formData.notifiedBodyAddress || "Takomotie 8"}</p>
+        <p className="mb-6">{formData.notifiedBodyZipCode || "FI - 00380"} {formData.notifiedBodyCountry || "Helsinki"}</p>
+
+        <div className="flex justify-between items-end mt-10">
+          <div>
+            <p className="mb-1 text-blue-600">www.bastadgruppen.com</p>
+            <p>Båstadgruppen AB</p>
+            <p className="mt-1 text-xs">0046123413445</p>
+          </div>
+          <div className="text-right">
+            <p className="mb-1">Product Manager</p>
+            {showSignature ? (
+              <>
+                <div className="h-20 mb-1 flex justify-end">
+                  <img src={signatureImage} alt="Signature" className="h-full" />
+                </div>
+                <p className="mb-1">{signatureData?.name}</p>
+              </>
+            ) : (
+              <p className="mb-1">Anders Andersson</p>
+            )}
+            <p>2024-08-29</p>
+          </div>
+        </div>
+      </div>
+    </div>
   );
-});
+};
 
 export default function DocForm() {
   const initialFormData: DocFormData = {
     productName: "",
     productCode: [""],
     brandName: "",
+    brandLogo: "",
     manufacturerAddress:
       "Båstadgruppen AB\nFraktgatan 1\n262 73 Ängelholm\nSweden",
     notifiedBodyName: "",
@@ -238,9 +272,19 @@ export default function DocForm() {
     e: React.ChangeEvent<HTMLSelectElement>,
     field: keyof DocFormData
   ) => {
+    const value = e.target.value;
+    const brandLogoMap: Record<string, string> = {
+      'Guardio': '/brands/guardio.png',
+      'Matterhorn': '/brands/matterhorn.png',
+      'Monitor': '/brands/monitor.png',
+      'Top Swede': '/brands/top-swede.png',
+      'South West': '/brands/south-west.png'
+    };
+
     setFormData((prev) => ({
       ...prev,
-      [field]: e.target.value,
+      [field]: value,
+      ...(field === 'brandName' && { brandLogo: brandLogoMap[value] || '' })
     }));
   };
 
@@ -315,6 +359,11 @@ export default function DocForm() {
 
   const generateDoc = (e: React.FormEvent) => {
     e.preventDefault();
+    // Validate required fields before showing preview
+    if (!formData.productName || !formData.productCode[0] || !formData.categoryClass) {
+      alert('Please fill in all required fields');
+      return;
+    }
     setShowPreview(true);
   };
 
@@ -675,22 +724,11 @@ export default function DocForm() {
         </form>
       ) : (
         <div className="w-full">
-          <button
-            onClick={() => setShowPreview(false)}
-            className="mb-4 inline-flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900"
-          >
-            <ArrowLeft className="w-4 h-4" /> Back to Form
-          </button>
           <div
             className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden"
             style={{ height: "calc(100vh - 120px)" }}
           >
-            <PDFViewer
-              style={{ width: "100%", height: "100%" }}
-              showToolbar={false}
-            >
-              <DocPDF formData={formData} />
-            </PDFViewer>
+            <DocumentPreview formData={formData} setShowPreview={setShowPreview} />
           </div>
         </div>
       )}

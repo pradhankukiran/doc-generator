@@ -6,7 +6,7 @@ A React-based web application that helps manufacturers generate Declaration of C
 
 - Form-based interface for entering product and manufacturer details
 - Support for multiple EU legislations and standards
-- PDF generation and preview
+- Document preview with print functionality
 - Responsive design with Tailwind CSS
 
 ## Technologies Used
@@ -15,7 +15,6 @@ A React-based web application that helps manufacturers generate Declaration of C
 - TypeScript
 - Vite
 - Tailwind CSS
-- react-pdf for PDF generation
 - Lucide React for icons
 
 ## Getting Started
@@ -64,8 +63,8 @@ The build artifacts will be stored in the `dist/` directory.
 1. Fill in the product details including name, model/type, and serial number
 2. Add manufacturer information
 3. Specify applicable EU legislations and harmonized standards
-4. Click "Generate Declaration" to preview the PDF
-5. Download or print the generated Declaration of Conformity
+4. Click "Generate Declaration" to preview the document
+5. Print the generated Declaration of Conformity using your browser's print functionality
 
 ## License
 
