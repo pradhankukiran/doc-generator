@@ -102,9 +102,9 @@ const DocumentPreview = ({ formData, setShowPreview }: { formData: DocFormData, 
     
     const element = documentRef.current;
     const opt = {
-      margin: 10,
+      margin: [10, 15, 10, 15],  // [top, right, bottom, left] margins in mm
       filename: `${formData.brandName || 'Bastadgruppen'}_Declaration_${new Date().toISOString().split('T')[0]}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
+      image: { type: 'jpeg', quality: 1 },
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
@@ -130,83 +130,85 @@ const DocumentPreview = ({ formData, setShowPreview }: { formData: DocFormData, 
           Download PDF
         </button>
       </div>
-      <div ref={documentRef} className="max-w-2xl mx-auto print:border-0 print:shadow-none">
+      <div ref={documentRef} className="max-w-2xl mx-auto print:border-0 print:shadow-none p-6">
         <div className="flex justify-end mb-6">
-          <img src="/logo.png" alt="Båstadgruppen Logo" className="h-14" />
+          <img src="/logo.png" alt="Båstadgruppen Logo" className="h-10" />
         </div>
         <div className="flex">
-          <div className="w-8 bg-black h-12 mr-4"></div>
+          <div className="w-6 bg-black h-10 mr-3"></div>
           <div>
-            <h1 className="text-2xl font-bold">EU Declaration of Conformity</h1>
-            <p className="font-medium">Category {formData.categoryClass || 'II'}</p>
+            <h1 className="text-lg font-bold">EU Declaration of Conformity</h1>
+            <p className="font-medium text-xs">Category {formData.categoryClass || 'II'}</p>
           </div>
         </div>
         
-        <p className="my-6">
+        <p className="my-3 text-sm">
           This declaration of conformity is issued under the sole responsibility
           of the manufacturer:
         </p>
         
-        <p className="mb-1">Båstadgruppen AB</p>
-        <p className="mb-1">Fraktgatan 1</p>
-        <p className="mb-1">262 73 Ängelholm</p>
-        <p className="mb-6">Sweden</p>
+        <p className="text-sm" style={{ marginBottom: '1px' }}>Båstadgruppen AB</p>
+        <p className="text-sm" style={{ marginBottom: '1px' }}>Fraktgatan 1</p>
+        <p className="text-sm" style={{ marginBottom: '1px' }}>262 73 Ängelholm</p>
+        <p className="text-sm" style={{ marginBottom: '5px' }}>Sweden</p>
 
-        <div className="my-8 text-center">
-          <p className="mb-4">
+        <div className="my-4 text-center">
+          <p className="mb-8 text-sm">
             The manufacturer hereby declares that the<br />
             below-described Personal Protective Equipment (PPE):
           </p>
           
           {showBrandLogo && (
-            <div className="flex justify-center my-6">
-              <img src={brandLogo} alt="Brand Logo" className="h-16" />
+            <div className="flex justify-center my-3">
+              <img src={brandLogo} alt="Brand Logo" className="h-10" />
             </div>
           )}
           
-          <p className="font-bold text-xl my-3">{formData.productName || 'Armet Safety Helmet'}</p>
-          <p className="mb-6">with item number {formData.productCode[0] || '1001933'}</p>
+          <p className="font-bold text-lg my-1">{formData.productName || 'Armet Safety Helmet'}</p>
+          <p className="mb-1 text-sm">with item number {formData.productCode[0] || '1001933'}</p>
         </div>
 
-        <p className="mb-4">
-          Is in conformity with the relevant Union harmonisation legislation: {formData.legislation[0] || 'Regulation (EU) 2016/425'} - 
+        <p className="mb-2 text-sm">
+          is in conformity with the relevant Union harmonisation legislation: {formData.legislation[0] || 'Regulation (EU) 2016/425'} - 
           and the relevant harmonized standards No.: {formData.standards.join(", ") || 'EN ISO 21420: 2020, EN 388:2016 + A1:2018 M.'}
         </p>
         
-        <p className="mb-4">
-          Is certified to be washed according to EN ISO 21420: General requirements
+        <p className="mb-2 text-sm">
+          is certified to be washed according to EN ISO 21420: General requirements
           (40°C/104°F -3 washing cycles)
         </p>
         
-        <p className="mb-6">
+        <p className="mb-3 text-sm">
           EU type-examination certificate (Module B) and issued the EU
           type-examination certificate No. {formData.certificateNumber || 'BP 60132703'}
         </p>
 
-        <p className="mb-1">{formData.notifiedBodyName || "SGS Fimko Ltd."}</p>
-        <p className="mb-1">Notified Body No. {formData.notifiedBodyNumber || "0598"}</p>
-        <p className="mb-1">{formData.notifiedBodyAddress || "Takomotie 8"}</p>
-        <p className="mb-6">{formData.notifiedBodyZipCode || "FI - 00380"} {formData.notifiedBodyCountry || "Helsinki"}</p>
-
-        <div className="flex justify-between items-end mt-10">
-          <div>
-            <p className="mb-1 text-blue-600">www.bastadgruppen.com</p>
-            <p>Båstadgruppen AB</p>
-            <p className="mt-1 text-xs">0046123413445</p>
+        <div className="flex justify-between items-start mb-6">
+          <div className="text-sm">
+            <p className="mb-1">{formData.notifiedBodyName || "SGS Fimko Ltd."}</p>
+            <p className="mb-1">Notified Body No. {formData.notifiedBodyNumber || "0598"}</p>
+            <p className="mb-1">{formData.notifiedBodyAddress || "Takomotie 8"}</p>
+            <p>{formData.notifiedBodyZipCode || "FI - 00380"} {formData.notifiedBodyCountry || "Helsinki"}</p>
           </div>
-          <div className="text-right">
-            <p className="mb-1">Product Manager</p>
+          
+          <div className="text-right text-sm">
             {showSignature ? (
               <>
-                <div className="h-20 mb-1 flex justify-end">
+                <div className="h-9 mb-1 flex justify-end">
                   <img src={signatureImage} alt="Signature" className="h-full" />
                 </div>
+                <p className="mb-1">Product Manager Safety</p>
                 <p className="mb-1">{signatureData?.name}</p>
+                <p>2024-08-29</p>
               </>
             ) : (
-              <p className="mb-1">Anders Andersson</p>
+              <>
+                <div className="h-9 mb-1"></div>
+                <p className="mb-1">Product Manager Safety</p>
+                <p className="mb-1">Anders Andersson</p>
+                <p>2024-08-29</p>
+              </>
             )}
-            <p>2024-08-29</p>
           </div>
         </div>
       </div>
