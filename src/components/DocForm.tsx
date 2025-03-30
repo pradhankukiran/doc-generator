@@ -367,6 +367,11 @@ export default function DocForm() {
       return;
     }
     setShowPreview(true);
+    // Scroll to the top of the page with smooth behavior
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
 
   return (
@@ -728,7 +733,7 @@ export default function DocForm() {
         <div className="w-full">
           <div
             className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden"
-            style={{ height: "calc(100vh - 120px)" }}
+            style={{ height: "100%)" }}
           >
             <DocumentPreview formData={formData} setShowPreview={setShowPreview} />
           </div>
