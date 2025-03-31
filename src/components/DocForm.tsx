@@ -101,7 +101,7 @@ const DocumentPreview = ({ formData, setShowPreview }: { formData: DocFormData, 
     
     const element = documentRef.current;
     const opt = {
-      margin: [10, 15, 10, 15],  // [top, right, bottom, left] margins in mm
+      margin: [5, 10, 0, 10],  // [top, right, bottom, left] margins in mm
       filename: `DOC - ${formData.brandName || 'Bastadgruppen'} - ${formData.productName || 'Declaration'} - ${formData.productCode[0] || 'N/A'}.pdf`,
       image: { type: 'jpeg', quality: 1 },
       html2canvas: { scale: 2, useCORS: true },
@@ -130,7 +130,7 @@ const DocumentPreview = ({ formData, setShowPreview }: { formData: DocFormData, 
         </button>
       </div>
       <div ref={documentRef} className="max-w-2xl mx-auto print:border-0 print:shadow-none p-6">
-        <div className="flex justify-end mb-6">
+        <div className="flex justify-end mb-3">
           <img src="/logo.png" alt="Båstadgruppen Logo" className="h-10" />
         </div>
         <div className="flex">
@@ -152,7 +152,7 @@ const DocumentPreview = ({ formData, setShowPreview }: { formData: DocFormData, 
         <p className="text-sm" style={{ marginBottom: '5px' }}>Sweden</p>
 
         <div className="my-4 text-center">
-          <p className="mb-8 text-sm">
+          <p className="mb-6 text-sm">
             The manufacturer hereby declares that the<br />
             below-described Personal Protective Equipment (PPE):
           </p>
@@ -168,16 +168,29 @@ const DocumentPreview = ({ formData, setShowPreview }: { formData: DocFormData, 
         </div>
 
         <p className="mb-3 text-sm">
-          is in conformity with the relevant Union harmonisation legislation: {formData.legislation[0] || 'Regulation (EU) 2016/425'} - 
-          and the relevant harmonized standards No.: {formData.standards.join(", ") || 'EN ISO 21420: 2020, EN 388:2016 + A1:2018 M.'}
+          is in conformity with the relevant Union harmonisation legislation: {formData.legislation[0] || 'Regulation (EU) 2016/425'}{' '}
+          and fulfills the applicable essential health and safety requirements set out in Annex II 
+          and the relevant harmonized standards or other technical specifications, No. :
         </p>
+        {formData.standards.length > 0 ? (
+          <div className="mb-3 text-sm">
+            {formData.standards.map((standard, index) => (
+              <div key={index} className="flex items-start">
+                <span className="inline-block w-4 text-center mr-1">•</span>
+                <span>{standard}</span>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="mb-3 text-sm pl-5">EN ISO 21420: 2020, EN 388:2016 + A1:2018 M.</p>
+        )}
         
         <p className="mb-6 text-sm">
           EU type-examination certificate (Module B) and issued the EU
           type-examination certificate No. {formData.certificateNumber || 'BP 60132703'}
         </p>
 
-        <div className="flex justify-between items-start mb-6">
+        <div className="flex justify-between items-start mb-3">
           <div className="text-sm">
             <p className="mb-1">{formData.notifiedBodyName || "SGS Fimko Ltd."}</p>
             <p className="mb-1">Notified Body No. {formData.notifiedBodyNumber || "0598"}</p>
@@ -207,7 +220,7 @@ const DocumentPreview = ({ formData, setShowPreview }: { formData: DocFormData, 
         </div>
 
         {/* Footer section */}
-        <div className="pt-10 mt-10 flex justify-between items-center text-sm text-gray-600">
+        <div className="pt-10 mt-1 flex justify-between items-center text-xs text-gray-600">
           <a href="https://www.bastadgruppen.com" className="text-blue-600 hover:underline">www.bastadgruppen.com</a>
           <span>Båstadgruppen AB</span>
           <span>0046123413445</span>
