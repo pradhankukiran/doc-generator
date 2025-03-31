@@ -43,11 +43,10 @@ const useImage = (path: string) => {
 };
 
 const formatDate = (date: Date) => {
-  return date.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  });
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
 };
 
 interface DocFormData {
@@ -103,7 +102,7 @@ const DocumentPreview = ({ formData, setShowPreview }: { formData: DocFormData, 
     const element = documentRef.current;
     const opt = {
       margin: [10, 15, 10, 15],  // [top, right, bottom, left] margins in mm
-      filename: `${formData.brandName || 'Bastadgruppen'}_Declaration_${new Date().toISOString().split('T')[0]}.pdf`,
+      filename: `DOC - ${formData.brandName || 'Bastadgruppen'} - ${formData.productName || 'Declaration'} - ${formData.productCode[0] || 'N/A'}.pdf`,
       image: { type: 'jpeg', quality: 1 },
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -168,17 +167,12 @@ const DocumentPreview = ({ formData, setShowPreview }: { formData: DocFormData, 
           <p className="mb-1 text-sm">with item number {formData.productCode[0] || '1001933'}</p>
         </div>
 
-        <p className="mb-2 text-sm">
+        <p className="mb-3 text-sm">
           is in conformity with the relevant Union harmonisation legislation: {formData.legislation[0] || 'Regulation (EU) 2016/425'} - 
           and the relevant harmonized standards No.: {formData.standards.join(", ") || 'EN ISO 21420: 2020, EN 388:2016 + A1:2018 M.'}
         </p>
         
-        <p className="mb-2 text-sm">
-          is certified to be washed according to EN ISO 21420: General requirements
-          (40°C/104°F -3 washing cycles)
-        </p>
-        
-        <p className="mb-3 text-sm">
+        <p className="mb-6 text-sm">
           EU type-examination certificate (Module B) and issued the EU
           type-examination certificate No. {formData.certificateNumber || 'BP 60132703'}
         </p>
@@ -199,17 +193,24 @@ const DocumentPreview = ({ formData, setShowPreview }: { formData: DocFormData, 
                 </div>
                 <p className="mb-1">Product Manager Safety</p>
                 <p className="mb-1">{signatureData?.name}</p>
-                <p>2024-08-29</p>
+                <p>{formatDate(new Date())}</p>
               </>
             ) : (
               <>
                 <div className="h-9 mb-1"></div>
                 <p className="mb-1">Product Manager Safety</p>
                 <p className="mb-1">Anders Andersson</p>
-                <p>2024-08-29</p>
+                <p>{formatDate(new Date())}</p>
               </>
             )}
           </div>
+        </div>
+
+        {/* Footer section */}
+        <div className="pt-10 mt-10 flex justify-between items-center text-sm text-gray-600">
+          <a href="https://www.bastadgruppen.com" className="text-blue-600 hover:underline">www.bastadgruppen.com</a>
+          <span>Båstadgruppen AB</span>
+          <span>0046123413445</span>
         </div>
       </div>
     </div>
