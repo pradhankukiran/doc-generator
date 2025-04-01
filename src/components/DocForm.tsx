@@ -102,7 +102,7 @@ const DocumentPreview = ({ formData, setShowPreview }: { formData: DocFormData, 
     const element = documentRef.current;
     const opt = {
       margin: [5, 10, 0, 10],  // [top, right, bottom, left] margins in mm
-      filename: `DOC - ${formData.brandName || 'Bastadgruppen'} - ${formData.productName || 'Declaration'} - ${formData.productCode[0] || 'N/A'}.pdf`,
+      filename: `DOC-${formData.brandName || 'Bastadgruppen'}-${formData.productName || 'Declaration'}-${formData.productCode.join('-') || 'N/A'}.pdf`,
       image: { type: 'jpeg', quality: 1 },
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
@@ -164,7 +164,7 @@ const DocumentPreview = ({ formData, setShowPreview }: { formData: DocFormData, 
           )}
           
           <p className="font-bold text-lg my-1">{formData.productName || 'Armet Safety Helmet'}</p>
-          <p className="mb-1 text-sm">with item number {formData.productCode[0] || '1001933'}</p>
+          <p className="mb-1 text-sm">with item number {formData.productCode.join(', ') || '1001933'}</p>
         </div>
 
         <p className="mb-3 text-sm">
