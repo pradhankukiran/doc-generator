@@ -64,6 +64,7 @@ interface DocFormData {
   standards: string[];
   certificateNumber: string;
   categoryClass: string;
+  moduleType: string;
 }
 
 const DocumentPreview = ({ formData, setShowPreview }: { formData: DocFormData, setShowPreview: (show: boolean) => void }) => {
@@ -137,7 +138,8 @@ const DocumentPreview = ({ formData, setShowPreview }: { formData: DocFormData, 
           <div className="w-6 bg-black h-10 mr-3"></div>
           <div>
             <h1 className="text-lg font-bold">EU Declaration of Conformity</h1>
-            <p className="font-medium text-xs">Category {formData.categoryClass || 'II'}</p>
+            <p className="font-medium text-xs">Category {formData.categoryClass || 'II'} 
+            {formData.categoryClass === "III" && formData.moduleType && ` - ${formData.moduleType}`}</p>
           </div>
         </div>
         
@@ -247,6 +249,7 @@ export default function DocForm() {
     standards: [""],
     certificateNumber: "",
     categoryClass: "",
+    moduleType: "",
   };
 
   const [formData, setFormData] = useState<DocFormData>(() => {
@@ -380,6 +383,13 @@ export default function DocForm() {
       alert('Please fill in all required fields');
       return;
     }
+    
+    // Check if moduleType is required but not provided
+    if (formData.categoryClass === "III" && !formData.moduleType) {
+      alert('Please select a Module Type for Class III');
+      return;
+    }
+    
     setShowPreview(true);
     // Scroll to the top of the page with smooth behavior
     window.scrollTo({
@@ -731,6 +741,30 @@ export default function DocForm() {
                 </select>
               </div>
             </div>
+
+            {formData.categoryClass === "III" && (
+              <div className="flex justify-center w-full">
+                <div className="w-full md:w-1/2">
+                  <label
+                    htmlFor="moduleType"
+                    className="block text-sm font-medium text-gray-700"
+                  >
+                    Module Type
+                  </label>
+                  <select
+                    id="moduleType"
+                    required
+                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                    value={formData.moduleType}
+                    onChange={(e) => handleSelectChange(e, "moduleType")}
+                  >
+                    <option value="">Select module type</option>
+                    <option value="Module C2">Module C2</option>
+                    <option value="Module D">Module D</option>
+                  </select>
+                </div>
+              </div>
+            )}
           </div>
 
           <div className="flex justify-center">
