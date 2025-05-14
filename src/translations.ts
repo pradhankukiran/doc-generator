@@ -53,25 +53,25 @@ export const translations: Record<string, Partial<Translations>> = {
     docTitle: "EU-försäkran om överensstämmelse",
     categoryLabel: "Kategori",
     responsibilityStatement: "Denna försäkran om överensstämmelse utfärdas på tillverkarens eget ansvar:",
-    manufacturerAddressLabel: "Båstadgruppen AB", // Keep same?
+    manufacturerAddressLabel: "Båstadgruppen AB",
     ppeLabel: "Tillverkaren försäkrar härmed att den nedan beskrivna personliga skyddsutrustningen (PPE):",
-    ppeNameLabel: "Produktnamn", // Swedish placeholder
+    ppeNameLabel: "Produktnamn",
     itemNumberLabel: "med artikelnummer",
     conformityLegislationLabel: "överensstämmer med relevant unionslagstiftning om harmonisering:",
     harmonisedStandardsLabel: "och uppfyller de tillämpliga väsentliga hälso- och säkerhetskraven i bilaga II och de relevanta harmoniserade standarderna eller andra tekniska specifikationer, nr:",
     euCertificateLabel: "EU-typintyg (Modul B) och utfärdade EU-typintyget nr.",
-    notifiedBodySectionLabel: "Anmält organ Information", // Placeholder
-    notifiedBodyLabel: "Anmält organ Namn", // Placeholder
+    notifiedBodySectionLabel: "Information om anmält organ",
+    notifiedBodyLabel: "Anmält organs namn",
     notifiedBodyNumberLabel: "Anmält organ nr.",
-    issuedByLabel: "utfärdat av", // Placeholder
-    signatureTitle: "Produktchef Säkerhet", // Placeholder
-    signatureNamePlaceholder: "Anders Andersson", // Placeholder
-    signatureDateLabel: "Datum", // Placeholder
+    issuedByLabel: "utfärdat av",
+    signatureTitle: "Produktchef Säkerhet",
+    signatureNamePlaceholder: "Anders Andersson",
+    signatureDateLabel: "Datum",
     backToFormButton: "Tillbaka till formulär",
     downloadPdfButton: "Ladda ner PDF",
     footerWebsite: "www.bastadgruppen.com",
     footerCompanyName: "Båstadgruppen AB",
-    footerPhoneNumber: "0046123413445", // Placeholder
+    footerPhoneNumber: "0046123413445",
   },
   // Add entries for 'no', 'da', 'fi', 'pl', 'et', 'de', 'fr', 'it', 'nl', 'pt', 'lv'
   // Example:
