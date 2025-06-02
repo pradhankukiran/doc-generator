@@ -28,14 +28,19 @@ export const translations: Record<string, Partial<Translations>> = {
   en: {
     docTitle: "EU Declaration of Conformity",
     categoryLabel: "Category",
-    responsibilityStatement: "This declaration of conformity is issued under the sole responsibility of the manufacturer:",
+    responsibilityStatement:
+      "This declaration of conformity is issued under the sole responsibility of the manufacturer:",
     manufacturerAddressLabel: "Båstadgruppen AB", // Assuming this is the intended section start
-    ppeLabel: "The manufacturer hereby declares that the below-described Personal Protective Equipment (PPE):",
+    ppeLabel:
+      "The manufacturer hereby declares that the below-described Personal Protective Equipment (PPE):",
     ppeNameLabel: "Product Name", // Added a basic label for the product name itself
     itemNumberLabel: "with item number",
-    conformityLegislationLabel: "is in conformity with the relevant Union harmonisation legislation:",
-    harmonisedStandardsLabel: "and fulfills the applicable essential health and safety requirements set out in Annex II and the relevant harmonized standards or other technical specifications, No. :",
-    euCertificateLabel: "EU type-examination certificate (Module B) and issued the EU type-examination certificate No.",
+    conformityLegislationLabel:
+      "is in conformity with the relevant Union harmonisation legislation:",
+    harmonisedStandardsLabel:
+      "and fulfills the applicable essential health and safety requirements set out in Annex II and the relevant harmonized standards or other technical specifications, No. :",
+    euCertificateLabel:
+      "EU type-examination certificate (Module B) and issued the EU type-examination certificate No.",
     notifiedBodySectionLabel: "Notified Body Information", // Added a generic label
     notifiedBodyLabel: "Notified Body Name", // Label inferred
     notifiedBodyNumberLabel: "Notified Body No.",
@@ -52,13 +57,17 @@ export const translations: Record<string, Partial<Translations>> = {
   sv: {
     docTitle: "EU-försäkran om överensstämmelse",
     categoryLabel: "Kategori",
-    responsibilityStatement: "Denna försäkran om överensstämmelse utfärdas på tillverkarens eget ansvar:",
+    responsibilityStatement:
+      "Denna försäkran om överensstämmelse utfärdas på tillverkarens eget ansvar:",
     manufacturerAddressLabel: "Båstadgruppen AB",
-    ppeLabel: "Tillverkaren försäkrar härmed att den nedan beskrivna personliga skyddsutrustningen (PPE):",
+    ppeLabel:
+      "Tillverkaren försäkrar härmed att den nedan beskrivna personliga skyddsutrustningen (PPE):",
     ppeNameLabel: "Produktnamn",
     itemNumberLabel: "med artikelnummer",
-    conformityLegislationLabel: "överensstämmer med relevant unionslagstiftning om harmonisering:",
-    harmonisedStandardsLabel: "och uppfyller de tillämpliga väsentliga hälso- och säkerhetskraven i bilaga II och de relevanta harmoniserade standarderna eller andra tekniska specifikationer, nr:",
+    conformityLegislationLabel:
+      "överensstämmer med relevant unionslagstiftning om harmonisering:",
+    harmonisedStandardsLabel:
+      "och uppfyller de tillämpliga väsentliga hälso- och säkerhetskraven i bilaga II och de relevanta harmoniserade standarderna eller andra tekniska specifikationer, nr:",
     euCertificateLabel: "EU-typintyg (Modul B) och utfärdade EU-typintyget nr.",
     notifiedBodySectionLabel: "Information om anmält organ",
     notifiedBodyLabel: "Anmält organs namn",
@@ -80,8 +89,10 @@ export const translations: Record<string, Partial<Translations>> = {
   is: {
     docTitle: "ESB-SAMRÆMISYFIRLÝSING",
     categoryLabel: "Flokkur:",
-    responsibilityStatement: "Þessi samræmisyfirlýsing er gefin út eingöngu á ábyrgð framleiðanda.",
-    ppeLabel: "Hlífðarbúnaðurinn sem lýst er hér að ofan er í samræmi við viðeigandi samhæfingarlöggjöf Sambandsins:",
+    responsibilityStatement:
+      "Þessi samræmisyfirlýsing er gefin út eingöngu á ábyrgð framleiðanda.",
+    ppeLabel:
+      "Hlífðarbúnaðurinn sem lýst er hér að ofan er í samræmi við viðeigandi samhæfingarlöggjöf Sambandsins:",
     itemNumberLabel: "Vörunúmer:",
     conformityLegislationLabel: "er í samræmi við löggjöf",
     harmonisedStandardsLabel: "og samræmda staðla",
@@ -100,7 +111,7 @@ export const translations: Record<string, Partial<Translations>> = {
 // Function to get translations for a specific language, falling back to English
 export const getTranslations = (lang: string): Translations => {
   const langTranslations = translations[lang] || {};
-  const defaultTranslations = translations['en'] as Translations; // Assume 'en' is always complete
+  const defaultTranslations = translations["en"] as Translations; // Assume 'en' is always complete
 
   // Merge language-specific translations with English fallback
   // Ensure all keys from the interface are present
@@ -108,7 +119,10 @@ export const getTranslations = (lang: string): Translations => {
   for (const key in defaultTranslations) {
     if (Object.prototype.hasOwnProperty.call(defaultTranslations, key)) {
       const typedKey = key as keyof Translations;
-      if (langTranslations[typedKey] !== undefined && langTranslations[typedKey] !== null) {
+      if (
+        langTranslations[typedKey] !== undefined &&
+        langTranslations[typedKey] !== null
+      ) {
         merged[typedKey] = langTranslations[typedKey] as string;
       }
     }
@@ -118,18 +132,18 @@ export const getTranslations = (lang: string): Translations => {
 
 // List of available languages based on the keys in the translations object
 export const availableLanguages: { code: string; name: string }[] = [
-  { code: 'en', name: 'English' },
-  { code: 'sv', name: 'Swedish' },
-  { code: 'no', name: 'Norwegian' },
-  { code: 'da', name: 'Danish' },
-  { code: 'fi', name: 'Finnish' },
-  { code: 'pl', name: 'Polish' },
-  { code: 'et', name: 'Estonian' },
-  { code: 'de', name: 'German' },
-  { code: 'fr', name: 'French' },
-  { code: 'it', name: 'Italian' },
-  { code: 'nl', name: 'Dutch' },
-  { code: 'pt', name: 'Portuguese' }, // Corrected spelling
-  { code: 'lv', name: 'Latvian' },
-  { code: 'is', name: 'Icelandic' },
-]; 
+  { code: "en", name: "English" },
+  { code: "sv", name: "Swedish" },
+  { code: "no", name: "Norwegian" },
+  { code: "da", name: "Danish" },
+  { code: "fi", name: "Finnish" },
+  { code: "pl", name: "Polish" },
+  { code: "et", name: "Estonian" },
+  { code: "de", name: "German" },
+  { code: "fr", name: "French" },
+  { code: "it", name: "Italian" },
+  { code: "nl", name: "Dutch" },
+  { code: "pt", name: "Portuguese" }, // Corrected spelling
+  { code: "lv", name: "Latvian" },
+  { code: "is", name: "Icelandic" },
+];

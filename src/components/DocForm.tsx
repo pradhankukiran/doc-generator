@@ -79,6 +79,7 @@ export interface DocFormData {
   certificateNumber: string;
   categoryClass: string;
   moduleType: string;
+  selectedNotifiedBodyId: string;
 }
 
 const DocumentPreview = ({
@@ -381,6 +382,7 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
     certificateNumber: "",
     categoryClass: "",
     moduleType: "",
+    selectedNotifiedBodyId: "",
   };
 
   const [formData, setFormData] = useState<DocFormData>(() => {
@@ -389,7 +391,7 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
       if (savedData) {
         const parsed = JSON.parse(savedData);
         if (parsed && typeof parsed.productName !== "undefined") {
-          return parsed;
+          return { ...initialFormData, ...parsed };
         }
       }
       return initialFormData;
@@ -401,8 +403,6 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
 
   const [showPreview, setShowPreview] = useState(false);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(["en"]);
-  const [selectedNotifiedBodyId, setSelectedNotifiedBodyId] =
-    useState<string>("");
   const [currentLanguage, setCurrentLanguage] = useState<string>(
     availableLanguages[0].code
   );
@@ -433,7 +433,6 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
   const clearForm = () => {
     setFormData(initialFormData);
     setSelectedLanguages(["en"]);
-    setSelectedNotifiedBodyId("");
     localStorage.removeItem("docFormData");
     if (onClearForm) onClearForm();
   };
@@ -474,29 +473,15 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
     const value = e.target.value;
 
     if (field === "notifiedBodySelect") {
-      setSelectedNotifiedBodyId(value);
-      if (value === "other" || value === "") {
-        setFormData((prev) => ({
-          ...prev,
-          notifiedBodyName: "",
-          notifiedBodyNumber: "",
-          notifiedBodyAddress: "",
-          notifiedBodyZipCode: "",
-          notifiedBodyCountry: "",
-        }));
-      } else {
-        const selectedBody = notifiedBodies.find((body) => body.id === value);
-        if (selectedBody) {
-          setFormData((prev) => ({
-            ...prev,
-            notifiedBodyName: selectedBody.name,
-            notifiedBodyNumber: selectedBody.number,
-            notifiedBodyAddress: selectedBody.address,
-            notifiedBodyZipCode: selectedBody.zipCode,
-            notifiedBodyCountry: selectedBody.country,
-          }));
-        }
-      }
+      setFormData((prev) => ({
+        ...prev,
+        selectedNotifiedBodyId: value,
+        notifiedBodyName: "",
+        notifiedBodyNumber: "",
+        notifiedBodyAddress: "",
+        notifiedBodyZipCode: "",
+        notifiedBodyCountry: "",
+      }));
     } else {
       const brandLogoMap: Record<string, string> = {
         Guardio: "/brands/guardio.png",
@@ -619,12 +604,12 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
       alert("Please select a Module Type for Class III.");
       return;
     }
-    if (!selectedNotifiedBodyId) {
+    if (!formData.selectedNotifiedBodyId) {
       alert('Please select a Notified Body or choose "Other".');
       return;
     }
     if (
-      selectedNotifiedBodyId === "other" &&
+      formData.selectedNotifiedBodyId === "other" &&
       (!formData.notifiedBodyName ||
         !formData.notifiedBodyNumber ||
         !formData.notifiedBodyAddress ||
@@ -679,7 +664,9 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
                       id="lang-all"
                       name="languages-all"
                       type="checkbox"
-                      checked={selectedLanguages.length === availableLanguages.length}
+                      checked={
+                        selectedLanguages.length === availableLanguages.length
+                      }
                       onChange={handleLanguageChange}
                       className={checkboxClassName}
                     />
@@ -871,7 +858,7 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
                   id="notifiedBodySelect"
                   required
                   className={selectClassName}
-                  value={selectedNotifiedBodyId}
+                  value={formData.selectedNotifiedBodyId}
                   onChange={(e) => handleSelectChange(e, "notifiedBodySelect")}
                 >
                   <option value="">Select Notified Body...</option>
@@ -883,7 +870,7 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
                   <option value="other">Other (Enter Manually)</option>
                 </select>
 
-                {selectedNotifiedBodyId === "other" && (
+                {formData.selectedNotifiedBodyId === "other" && (
                   <div className="mt-4 space-y-4 p-5 bg-surface-tertiary rounded-md border border-border-light">
                     <p className="text-sm text-primary-600 mb-3">
                       Enter Notified Body details manually:
