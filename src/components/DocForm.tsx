@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { FileText, Plus, Trash2, ArrowLeft, RefreshCw, Download } from "lucide-react";
 import { getTranslations, availableLanguages, Translations } from '../translations';
 import { notifiedBodies, NotifiedBody } from '../notifiedBodies';
@@ -126,20 +127,20 @@ const DocumentPreview = ({
       <div className="mb-4 flex justify-between print:hidden">
         <button
           onClick={() => setShowPreview(false)}
-          className="bg-gray-600 text-white py-2 px-4 rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
+          className="bg-primary-700 text-white py-2 px-4 rounded-md hover:bg-primary-800 focus:outline-none focus:ring-0 transition-colors duration-200 text-sm font-medium flex items-center gap-2 shadow-button"
         >
           <ArrowLeft className="w-4 h-4" />
           {buttonT.backToFormButton}
         </button>
         <button
           onClick={handleDownloadPDF}
-          className="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200 text-sm font-medium flex items-center gap-2"
+          className="bg-accent text-white py-2 px-4 rounded-md hover:bg-accent-hover focus:outline-none focus:ring-0 transition-colors duration-200 text-sm font-medium flex items-center gap-2 shadow-button"
         >
           <Download className="w-4 h-4" />
           {buttonT.downloadPdfButton}
         </button>
       </div>
-      <div ref={documentRef} className="max-w-2xl mx-auto print:border-0 print:shadow-none">
+      <div ref={documentRef} className="max-w-2xl mx-auto print:border-0 print:shadow-none shadow-card">
         {selectedLanguages.map((lang, index) => {
           const t = getTranslations(lang);
           return (
@@ -151,8 +152,11 @@ const DocumentPreview = ({
                 <div className="w-6 bg-black h-10 mr-3"></div>
                 <div>
                   <h1 className="text-lg font-bold">{t.docTitle}</h1>
-                  <p className="font-medium text-xs">{t.categoryLabel} {formData.categoryClass || 'II'}
-                  {formData.categoryClass === "III" && formData.moduleType && ` - ${formData.moduleType}`}</p>
+                  <p className="font-medium text-xs">
+                    {t.categoryLabel} {formData.categoryClass || 'II'}
+                    {formData.categoryClass === "II" && " - Module B"}
+                    {formData.categoryClass === "III" && formData.moduleType && ` - ${formData.moduleType}`}
+                  </p>
                 </div>
               </div>
               
@@ -193,9 +197,33 @@ const DocumentPreview = ({
                 <p className="mb-3 text-sm pl-5">EN ISO 21420: 2020, EN 388:2016 + A1:2018 M.</p>
               )}
               
-              <p className="mb-6 text-sm">
-                {t.euCertificateLabel} {formData.certificateNumber || 'BP 60132703'}
-              </p>
+              {(() => {
+                const notifiedBodyName = formData.notifiedBodyName || "SGS Fimko Ltd.";
+                const notifiedBodyNumber = formData.notifiedBodyNumber || "0598";
+                const certificateNumberVal = formData.certificateNumber || 'BP 60132703';
+                const notifiedBodyInfoStr = `${notifiedBodyName} (No ${notifiedBodyNumber})`;
+                let statement = "";
+
+                if (formData.categoryClass === "I") {
+                  statement = `${t.euCertificateLabel} ${certificateNumberVal}`;
+                } else if (formData.categoryClass === "II") {
+                  statement = `The notified body "${notifiedBodyInfoStr}" performed the EU type-examination (Module B) and issued the EU type-examination certificate "${certificateNumberVal}".`;
+                } else if (formData.categoryClass === "III") {
+                  const baseStatement = `The notified body "${notifiedBodyInfoStr}" performed the EU type-examination (Module B) and issued the EU type-examination certificate "${certificateNumberVal}".`;
+                  if (formData.moduleType === "Module C2") {
+                    statement = `${baseStatement} The PPE is subject to the conformity assessment procedure based on internal production control plus supervised product checks at random intervals (Module C2) under surveillance of the notified body "${notifiedBodyInfoStr}".`;
+                  } else if (formData.moduleType === "Module D") {
+                    statement = `${baseStatement} The PPE is subject to the conformity assessment procedure based on quality assurance of the production process (Module D) under surveillance of the notified body "${notifiedBodyInfoStr}".`;
+                  } else {
+                    // Fallback for Category III if moduleType is unexpected or not set (form validation should usually prevent the latter)
+                    statement = baseStatement; 
+                  }
+                } else {
+                  // Fallback for cases where categoryClass might be empty or unexpected, though form validation should prevent this.
+                  statement = `${t.euCertificateLabel} ${certificateNumberVal}`;
+                }
+                return <p className="mb-6 text-sm">{statement}</p>;
+              })()}
 
               <div className="flex justify-between items-start mb-3">
                 <div className="text-sm">
@@ -239,7 +267,14 @@ const DocumentPreview = ({
   );
 };
 
+// Update input styles to create a more refined, premium look
+const inputClassName = "mt-1 block w-full rounded-md border-0 bg-primary-50 py-1.5 px-3 text-primary-900 shadow-subtle ring-0 placeholder:text-primary-400 focus:bg-white focus:ring-1 focus:ring-inset focus:ring-accent sm:text-sm";
+const selectClassName = "mt-1 block w-full rounded-md border-0 bg-primary-50 py-1.5 px-3 text-primary-900 shadow-subtle ring-0 focus:bg-white focus:ring-1 focus:ring-inset focus:ring-accent sm:text-sm";
+const checkboxClassName = "h-4 w-4 rounded border-0 bg-primary-50 text-accent shadow-subtle focus:ring-0 focus:ring-offset-0";
+
 export default function DocForm() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const initialFormData: DocFormData = {
     productName: "",
     productCode: [""],
@@ -278,6 +313,22 @@ export default function DocForm() {
   const [showPreview, setShowPreview] = useState(false);
   const [selectedLanguages, setSelectedLanguages] = useState<string[]>(['en']);
   const [selectedNotifiedBodyId, setSelectedNotifiedBodyId] = useState<string>('');
+  const [currentLanguage, setCurrentLanguage] = useState<string>(availableLanguages[0].code);
+
+  const t = getTranslations(currentLanguage);
+
+  useEffect(() => {
+    if (location.pathname === '/doc' && location.state) {
+      const { formData: navFormData, selectedLanguages: navSelectedLanguages } = location.state as { formData: DocFormData, selectedLanguages: string[] };
+      if (navFormData && navSelectedLanguages) {
+        setFormData(navFormData);
+        setSelectedLanguages(navSelectedLanguages);
+        setShowPreview(true);
+      }
+    } else {
+      setShowPreview(false);
+    }
+  }, [location]);
 
   const clearForm = () => {
     setFormData(initialFormData);
@@ -352,10 +403,19 @@ export default function DocForm() {
   };
 
   const handleLanguageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value, checked } = e.target;
-    setSelectedLanguages(prev =>
-      checked ? [...prev, value] : prev.filter(lang => lang !== value)
-    );
+    const { value, checked, id } = e.target;
+
+    if (id === 'lang-all') {
+      if (checked) {
+        setSelectedLanguages(availableLanguages.map(lang => lang.code));
+      } else {
+        setSelectedLanguages([]);
+      }
+    } else {
+      setSelectedLanguages(prev =>
+        checked ? [...prev, value] : prev.filter(lang => lang !== value)
+      );
+    }
   };
 
   const handleProductCodeChange = (index: number, value: string) => {
@@ -455,157 +515,192 @@ export default function DocForm() {
         return;
     }
 
-    setShowPreview(true);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate('/doc', { state: { formData, selectedLanguages } });
   };
+
+  if (showPreview) {
+    return <DocumentPreview formData={formData} selectedLanguages={selectedLanguages} setShowPreview={() => navigate('/')} />;
+  }
 
   return (
     <div className="container max-w-7xl mx-auto">
       {!showPreview ? (
         <form
           onSubmit={generateDoc}
-          className="space-y-8 bg-white p-6 sm:p-8 rounded-lg shadow-lg border border-gray-200 mx-auto w-full max-w-2xl lg:max-w-none"
+          className="space-y-10 mx-auto w-full max-w-2xl lg:max-w-none"
         >
-          <div>
-            <div className="flex justify-between items-start">
+          <div className="bg-white p-6 sm:p-8 rounded-lg shadow-card">
+            <div className="flex justify-between items-start mb-6">
               <div>
-                <h2 className="text-lg font-medium text-gray-900">
+                <h2 className="text-lg font-display font-medium text-primary-900">
                   Declaration Details
                 </h2>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-primary-600">
                   Fill in the form to generate the Declaration of Conformity.
                 </p>
               </div>
               <button
                 type="button"
                 onClick={clearForm}
-                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-primary-700 bg-white border border-primary-200 rounded-md hover:bg-primary-50 focus:outline-none focus:ring-0 shadow-button transition-all duration-150"
               >
                 <RefreshCw className="w-4 h-4" />
                 Clear Form
               </button>
             </div>
-          </div>
-          <div className="border-t border-gray-200 pt-6">
-             <h3 className="text-base font-semibold leading-7 text-gray-900">Languages</h3>
-             <p className="mt-1 text-sm text-gray-500">Select the languages for the generated document.</p>
-             <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                 {availableLanguages.map(lang => (
-                     <div key={lang.code} className="relative flex items-start">
-                         <div className="flex h-6 items-center">
-                             <input
-                                 id={`lang-${lang.code}`}
-                                 name="languages"
-                                 type="checkbox"
-                                 value={lang.code}
-                                 checked={selectedLanguages.includes(lang.code)}
-                                 onChange={handleLanguageChange}
-                                 className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
-                             />
-                         </div>
-                         <div className="ml-3 text-sm leading-6">
-                             <label htmlFor={`lang-${lang.code}`} className="font-medium text-gray-900">
-                                 {lang.name}
-                             </label>
-                         </div>
-                     </div>
-                 ))}
-             </div>
-          </div>
-          <div className="border-t border-gray-200 pt-6">
-             <h3 className="text-base font-semibold leading-7 text-gray-900">Product Information</h3>
-            <div className="mt-4 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label
-                  htmlFor="productName"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Product Name <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="productName"
-                  required
-                  placeholder="Enter product name"
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  value={formData.productName}
-                  onChange={(e) => handleInputChange(e, "productName")}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Product number(s) <span className="text-red-500">*</span>
-                </label>
-                <div className="space-y-2">
-                  {formData.productCode.map((code, index) => (
-                    <div key={index} className="flex gap-2 items-center">
+          
+            <div className="mb-8">
+              <h3 className="text-base font-semibold leading-7 text-primary-900 mb-4">Languages</h3>
+              <p className="mb-4 text-sm text-primary-500">Select the languages for the generated document.</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {availableLanguages.map(lang => (
+                  <div key={lang.code} className="relative flex items-center">
+                    <div className="flex h-6 items-center">
                       <input
-                        type="text"
-                        required={index === 0}
-                        placeholder="Enter product number"
-                        className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        value={code}
-                        onChange={(e) =>
-                          handleProductCodeChange(index, e.target.value)
-                        }
+                        id={`lang-${lang.code}`}
+                        name="languages"
+                        type="checkbox"
+                        value={lang.code}
+                        checked={selectedLanguages.includes(lang.code)}
+                        onChange={handleLanguageChange}
+                        className={checkboxClassName}
                       />
-                      {formData.productCode.length > 1 && (
-                        <button
-                          type="button"
-                          onClick={() => removeProductCode(index)}
-                          className="p-2 text-red-600 hover:text-red-700 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                          aria-label="Remove product number"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
                     </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={addProductCode}
-                    className="inline-flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-md"
-                  >
-                    <Plus className="w-4 h-4" /> Add product number
-                  </button>
+                    <div className="ml-3 text-sm leading-6">
+                      <label htmlFor={`lang-${lang.code}`} className="font-medium text-primary-900">
+                        {lang.name}
+                      </label>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-4 relative flex items-center">
+                <div className="flex h-6 items-center">
+                  <input
+                    id="lang-all"
+                    name="languages-all"
+                    type="checkbox"
+                    checked={selectedLanguages.length === availableLanguages.length}
+                    onChange={handleLanguageChange}
+                    className={checkboxClassName}
+                  />
+                </div>
+                <div className="ml-3 text-sm leading-6">
+                  <label htmlFor="lang-all" className="font-medium text-primary-900">
+                    Select All
+                  </label>
                 </div>
               </div>
             </div>
+          </div>
+
+          <div className="bg-white p-6 sm:p-8 rounded-lg shadow-card">
+            <h3 className="text-base font-semibold leading-7 text-primary-900 mb-4">Product Information</h3>
+            <div className="space-y-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label
+                    htmlFor="productName"
+                    className="block text-sm font-medium text-primary-700"
+                  >
+                    Product Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="productName"
+                    required
+                    placeholder="Enter product name"
+                    className={inputClassName}
+                    value={formData.productName}
+                    onChange={(e) => handleInputChange(e, "productName")}
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-primary-700 mb-1">
+                    Product number(s) <span className="text-red-500">*</span>
+                  </label>
+                  <div className="space-y-2">
+                    {formData.productCode.map((code, index) => (
+                      <div key={index} className="flex gap-2 items-center">
+                        <input
+                          type="text"
+                          required={index === 0}
+                          placeholder="Enter product number"
+                          className={inputClassName}
+                          value={code}
+                          onChange={(e) =>
+                            handleProductCodeChange(index, e.target.value)
+                          }
+                        />
+                        {formData.productCode.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeProductCode(index)}
+                            className="p-2 text-primary-400 hover:text-red-600 rounded-md focus:outline-none focus:ring-0 transition-colors duration-150"
+                            aria-label="Remove product number"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={addProductCode}
+                      className="inline-flex items-center gap-1 text-sm text-accent hover:text-accent-hover focus:outline-none focus:ring-0 rounded-md transition-colors duration-150"
+                    >
+                      <Plus className="w-4 h-4" /> Add product number
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div className="border-t border-gray-200 pt-6">
-            <h3 className="text-base font-semibold leading-7 text-gray-900">Manufacturer Details</h3>
-            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+
+          <div className="bg-white p-6 sm:p-8 rounded-lg shadow-card">
+            <h3 className="text-base font-semibold leading-7 text-primary-900 mb-4">Manufacturer Details</h3>
+            <div className="grid grid-cols-1 gap-6">
               <div>
-                <label
-                  htmlFor="brandName"
-                  className="block text-sm font-medium text-gray-700"
-                >
+                <label className="block text-sm font-medium text-primary-700 mb-3">
                   Brand / Manufacturer <span className="text-red-500">*</span>
                 </label>
-                <select
-                  id="brandName"
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  value={formData.brandName}
-                  onChange={(e) => handleSelectChange(e, "brandName")}
-                >
-                  <option value="">Select brand</option>
-                  <option value="Guardio">Guardio</option>
-                  <option value="Matterhorn">Matterhorn</option>
-                  <option value="Monitor">Monitor</option>
-                  <option value="Top Swede">Top Swede</option>
-                  <option value="South West">South West</option>
-                </select>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                  {['Guardio', 'Matterhorn', 'Monitor', 'Top Swede', 'South West'].map(brand => (
+                    <div 
+                      key={brand}
+                      onClick={() => {
+                        const fakeEvent = { 
+                          target: { 
+                            value: brand 
+                          } 
+                        } as unknown as React.ChangeEvent<HTMLSelectElement>;
+                        handleSelectChange(fakeEvent, "brandName");
+                      }}
+                      className={`border rounded-md p-3 flex flex-col items-center justify-center cursor-pointer transition-all duration-150 ${
+                        formData.brandName === brand 
+                          ? 'border-accent border-2 bg-primary-100 shadow-md' 
+                          : 'border-primary-200 hover:border-primary-300 hover:bg-primary-50'
+                      }`}
+                    >
+                      <div className="h-12 flex items-center justify-center mb-2">
+                        <img 
+                          src={`/brands/${brand.toLowerCase().replace(' ', '-')}.png`} 
+                          alt={`${brand} logo`}
+                          className="h-8 object-contain" 
+                        />
+                      </div>
+                      <span className="text-sm font-medium text-primary-900">{brand}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-primary-700">
                   Manufacturer Address
                 </label>
-                <div className="mt-1 p-3 bg-gray-100 rounded-md text-sm text-gray-800 border border-gray-200">
+                <div className="mt-1 p-3 bg-primary-50 rounded-md text-sm text-primary-800">
                   Båstadgruppen AB
                   <br />
                   Fraktgatan 1<br />
@@ -616,208 +711,207 @@ export default function DocForm() {
               </div>
             </div>
           </div>
-          <div className="border-t border-gray-200 pt-6">
-             <h3 className="text-base font-semibold leading-7 text-gray-900">Compliance Information</h3>
-            <div className="mt-4 space-y-4">
 
-            <div className="border-b border-gray-200 pb-6">
-                 <label htmlFor="notifiedBodySelect" className="block text-sm font-medium text-gray-700">
-                     Notified Body <span className="text-red-500">*</span>
-                 </label>
-                 <select
-                     id="notifiedBodySelect"
-                     required
-                     className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                     value={selectedNotifiedBodyId}
-                     onChange={(e) => handleSelectChange(e, 'notifiedBodySelect')}
-                 >
-                     <option value="">Select Notified Body...</option>
-                     {notifiedBodies.map(body => (
-                         <option key={body.id} value={body.id}>{body.name} ({body.number})</option>
-                     ))}
-                     <option value="other">Other (Enter Manually)</option>
-                 </select>
-
-                 {selectedNotifiedBodyId === 'other' && (
-                     <div className="mt-4 space-y-4 p-4 border border-dashed border-gray-300 rounded-md">
-                         <p className="text-sm text-gray-600">Enter Notified Body details manually:</p>
-                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label htmlFor="notifiedBodyName" className="block text-sm font-medium text-gray-700">Name <span className="text-red-500">*</span></label>
-                                <input type="text" id="notifiedBodyName" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.notifiedBodyName} onChange={(e) => handleInputChange(e, "notifiedBodyName")} />
-                            </div>
-                            <div>
-                                <label htmlFor="notifiedBodyNumber" className="block text-sm font-medium text-gray-700">Number <span className="text-red-500">*</span></label>
-                                <input type="text" id="notifiedBodyNumber" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.notifiedBodyNumber} onChange={(e) => handleInputChange(e, "notifiedBodyNumber")} />
-                            </div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <label htmlFor="notifiedBodyAddress" className="block text-sm font-medium text-gray-700">Address <span className="text-red-500">*</span></label>
-                                <input type="text" id="notifiedBodyAddress" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.notifiedBodyAddress} onChange={(e) => handleInputChange(e, "notifiedBodyAddress")} />
-                            </div>
-                            <div>
-                                <label htmlFor="notifiedBodyZipCode" className="block text-sm font-medium text-gray-700">Zip Code <span className="text-red-500">*</span></label>
-                                <input type="text" id="notifiedBodyZipCode" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.notifiedBodyZipCode} onChange={(e) => handleInputChange(e, "notifiedBodyZipCode")} />
-                            </div>
-                            <div>
-                                <label htmlFor="notifiedBodyCountry" className="block text-sm font-medium text-gray-700">Country <span className="text-red-500">*</span></label>
-                                <input type="text" id="notifiedBodyCountry" required className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" value={formData.notifiedBodyCountry} onChange={(e) => handleInputChange(e, "notifiedBodyCountry")} />
-                            </div>
-                        </div>
-                     </div>
-                 )}
-            </div>
-
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Relevant EU Legislation
-                </label>
-                <div className="space-y-2">
-                  {formData.legislation.map((item, index) => (
-                    <div key={index} className="flex gap-2 items-center">
-                      <input
-                        type="text"
-                        required={index === 0}
-                        placeholder="e.g., Regulation (EU) 2016/425"
-                        className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        value={item}
-                        onChange={(e) =>
-                          handleLegislationChange(index, e.target.value)
-                        }
-                      />
-                      {formData.legislation.length > 1 && (
-                         <button
-                          type="button"
-                          onClick={() => removeLegislation(index)}
-                          className="p-2 text-red-600 hover:text-red-700 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                          aria-label="Remove legislation"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                   <button
-                    type="button"
-                    onClick={addLegislation}
-                    className="inline-flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-md"
-                  >
-                    <Plus className="w-4 h-4" /> Add Legislation
-                  </button>
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Harmonised Standards
-                </label>
-                <div className="space-y-2">
-                  {formData.standards.map((standard, index) => (
-                    <div key={index} className="flex gap-2 items-center">
-                      <input
-                        type="text"
-                        required={index === 0}
-                        placeholder="e.g., EN ISO 21420:2020"
-                        className="flex-1 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                        value={standard}
-                        onChange={(e) =>
-                          handleStandardChange(index, e.target.value)
-                        }
-                      />
-                      {formData.standards.length > 1 && (
-                         <button
-                          type="button"
-                          onClick={() => removeStandard(index)}
-                          className="p-2 text-red-600 hover:text-red-700 rounded-md focus:outline-none focus:ring-2 focus:ring-red-500"
-                          aria-label="Remove standard"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
-                    </div>
-                  ))}
-                  <button
-                    type="button"
-                    onClick={addStandard}
-                    className="inline-flex items-center gap-1 text-sm text-indigo-600 hover:text-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 rounded-md"
-                  >
-                    <Plus className="w-4 h-4" /> Add standard
-                  </button>
-                </div>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4">
-               <div>
-                <label
-                  htmlFor="certificateNumber"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Certificate Number <span className="text-red-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  id="certificateNumber"
-                  placeholder="Enter certificate number"
-                  required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  value={formData.certificateNumber}
-                  onChange={(e) => handleInputChange(e, "certificateNumber")}
-                />
-              </div>
-
-              <div>
-                <label
-                  htmlFor="categoryClass"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Category Class <span className="text-red-500">*</span>
+          <div className="bg-white p-6 sm:p-8 rounded-lg shadow-card">
+            <h3 className="text-base font-semibold leading-7 text-primary-900 mb-4">Compliance Information</h3>
+            <div className="space-y-6">
+              <div className="pb-6 border-b border-primary-100">
+                <label htmlFor="notifiedBodySelect" className="block text-sm font-medium text-primary-700 mb-2">
+                  Notified Body <span className="text-red-500">*</span>
                 </label>
                 <select
-                  id="categoryClass"
+                  id="notifiedBodySelect"
                   required
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  value={formData.categoryClass}
-                  onChange={(e) => handleSelectChange(e, "categoryClass")}
+                  className={selectClassName}
+                  value={selectedNotifiedBodyId}
+                  onChange={(e) => handleSelectChange(e, 'notifiedBodySelect')}
                 >
-                  <option value="">Select category class</option>
-                  <option value="I">Class I</option>
-                  <option value="II">Class II</option>
-                  <option value="III">Class III</option>
+                  <option value="">Select Notified Body...</option>
+                  {notifiedBodies.map(body => (
+                    <option key={body.id} value={body.id}>{body.name} ({body.number})</option>
+                  ))}
+                  <option value="other">Other (Enter Manually)</option>
                 </select>
+
+                {selectedNotifiedBodyId === 'other' && (
+                  <div className="mt-4 space-y-4 p-5 bg-primary-50 rounded-md">
+                    <p className="text-sm text-primary-600 mb-3">Enter Notified Body details manually:</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <label htmlFor="notifiedBodyName" className="block text-sm font-medium text-primary-700">Name <span className="text-red-500">*</span></label>
+                        <input type="text" id="notifiedBodyName" required className={inputClassName} value={formData.notifiedBodyName} onChange={(e) => handleInputChange(e, "notifiedBodyName")} />
+                      </div>
+                      <div>
+                        <label htmlFor="notifiedBodyNumber" className="block text-sm font-medium text-primary-700">Number <span className="text-red-500">*</span></label>
+                        <input type="text" id="notifiedBodyNumber" required className={inputClassName} value={formData.notifiedBodyNumber} onChange={(e) => handleInputChange(e, "notifiedBodyNumber")} />
+                      </div>
+                    </div>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                      <div>
+                        <label htmlFor="notifiedBodyAddress" className="block text-sm font-medium text-primary-700">Address <span className="text-red-500">*</span></label>
+                        <input type="text" id="notifiedBodyAddress" required className={inputClassName} value={formData.notifiedBodyAddress} onChange={(e) => handleInputChange(e, "notifiedBodyAddress")} />
+                      </div>
+                      <div>
+                        <label htmlFor="notifiedBodyZipCode" className="block text-sm font-medium text-primary-700">Zip Code <span className="text-red-500">*</span></label>
+                        <input type="text" id="notifiedBodyZipCode" required className={inputClassName} value={formData.notifiedBodyZipCode} onChange={(e) => handleInputChange(e, "notifiedBodyZipCode")} />
+                      </div>
+                      <div>
+                        <label htmlFor="notifiedBodyCountry" className="block text-sm font-medium text-primary-700">Country <span className="text-red-500">*</span></label>
+                        <input type="text" id="notifiedBodyCountry" required className={inputClassName} value={formData.notifiedBodyCountry} onChange={(e) => handleInputChange(e, "notifiedBodyCountry")} />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-medium text-primary-700 mb-1">
+                    Relevant EU Legislation
+                  </label>
+                  <div className="space-y-2">
+                    {formData.legislation.map((item, index) => (
+                      <div key={index} className="flex gap-2 items-center">
+                        <input
+                          type="text"
+                          required={index === 0}
+                          placeholder="e.g., Regulation (EU) 2016/425"
+                          className={inputClassName}
+                          value={item}
+                          onChange={(e) =>
+                            handleLegislationChange(index, e.target.value)
+                          }
+                        />
+                        {formData.legislation.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeLegislation(index)}
+                            className="p-2 text-primary-400 hover:text-red-600 rounded-md focus:outline-none focus:ring-0 transition-colors duration-150"
+                            aria-label="Remove legislation"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={addLegislation}
+                      className="inline-flex items-center gap-1 text-sm text-accent hover:text-accent-hover focus:outline-none focus:ring-0 rounded-md transition-colors duration-150"
+                    >
+                      <Plus className="w-4 h-4" /> Add Legislation
+                    </button>
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-primary-700 mb-1">
+                    Harmonised Standards
+                  </label>
+                  <div className="space-y-2">
+                    {formData.standards.map((standard, index) => (
+                      <div key={index} className="flex gap-2 items-center">
+                        <input
+                          type="text"
+                          required={index === 0}
+                          placeholder="e.g., EN ISO 21420:2020"
+                          className={inputClassName}
+                          value={standard}
+                          onChange={(e) =>
+                            handleStandardChange(index, e.target.value)
+                          }
+                        />
+                        {formData.standards.length > 1 && (
+                          <button
+                            type="button"
+                            onClick={() => removeStandard(index)}
+                            className="p-2 text-primary-400 hover:text-red-600 rounded-md focus:outline-none focus:ring-0 transition-colors duration-150"
+                            aria-label="Remove standard"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                    <button
+                      type="button"
+                      onClick={addStandard}
+                      className="inline-flex items-center gap-1 text-sm text-accent hover:text-accent-hover focus:outline-none focus:ring-0 rounded-md transition-colors duration-150"
+                    >
+                      <Plus className="w-4 h-4" /> Add standard
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <label
+                    htmlFor="certificateNumber"
+                    className="block text-sm font-medium text-primary-700"
+                  >
+                    Certificate Number <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    id="certificateNumber"
+                    placeholder="Enter certificate number"
+                    required
+                    className={inputClassName}
+                    value={formData.certificateNumber}
+                    onChange={(e) => handleInputChange(e, "certificateNumber")}
+                  />
+                </div>
+
+                <div>
+                  <label
+                    htmlFor="categoryClass"
+                    className="block text-sm font-medium text-primary-700"
+                  >
+                    Category Class <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="categoryClass"
+                    required
+                    className={selectClassName}
+                    value={formData.categoryClass}
+                    onChange={(e) => handleSelectChange(e, "categoryClass")}
+                  >
+                    <option value="">Select category class</option>
+                    <option value="I">Class I</option>
+                    <option value="II">Class II</option>
+                    <option value="III">Class III</option>
+                  </select>
+                </div>
+              </div>
+
+              {formData.categoryClass === "III" && (
+                <div>
+                  <label
+                    htmlFor="moduleType"
+                    className="block text-sm font-medium text-primary-700"
+                  >
+                    Module Type (for Class III) <span className="text-red-500">*</span>
+                  </label>
+                  <select
+                    id="moduleType"
+                    required
+                    className={selectClassName}
+                    value={formData.moduleType}
+                    onChange={(e) => handleSelectChange(e, "moduleType")}
+                  >
+                    <option value="">Select module type</option>
+                    <option value="Module C2">Module C2</option>
+                    <option value="Module D">Module D</option>
+                  </select>
+                </div>
+              )}
             </div>
-
-             {formData.categoryClass === "III" && (
-              <div className="pt-4">
-                <label
-                  htmlFor="moduleType"
-                  className="block text-sm font-medium text-gray-700"
-                >
-                  Module Type (for Class III) <span className="text-red-500">*</span>
-                </label>
-                <select
-                  id="moduleType"
-                  required
-                  className="mt-1 block w-full md:w-1/2 rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-                  value={formData.moduleType}
-                  onChange={(e) => handleSelectChange(e, "moduleType")}
-                >
-                  <option value="">Select module type</option>
-                  <option value="Module C2">Module C2</option>
-                  <option value="Module D">Module D</option>
-                </select>
-              </div>
-            )}
-          </div>
           </div>
 
-          <div className="pt-8 flex justify-center border-t border-gray-200">
+          <div className="flex justify-center py-6">
             <button
               type="submit"
-              className="w-full max-w-xs bg-indigo-600 text-white py-3 px-4 rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition-colors duration-200 text-base font-semibold flex items-center justify-center gap-2"
+              className="w-full max-w-xs bg-accent text-white py-3 px-4 rounded-md shadow-button hover:bg-accent-hover focus:outline-none focus:ring-0 transition-all duration-200 text-base font-semibold flex items-center justify-center gap-2 hover:shadow-md"
             >
               <FileText className="w-5 h-5" />
               Generate Declaration
@@ -827,7 +921,7 @@ export default function DocForm() {
       ) : (
          <div className="w-full">
           <div
-            className="bg-white rounded-lg shadow-lg border border-gray-200 overflow-hidden"
+            className="bg-white rounded-lg shadow-card border-0 overflow-hidden"
             style={{ minHeight: "calc(100vh - 200px)" }}
           >
             <DocumentPreview

@@ -17,39 +17,44 @@ export const notifiedBodies: NotifiedBody[] = [
     zipCode: 'FI - 00380',
     country: 'Helsinki'
   },
-  // Placeholder Notified Bodies
   {
-    id: 'notified_body_alpha',
-    name: 'NotifiedBodyAlpha GmbH',
-    number: '0123',
-    address: 'Alpha Strasse 1',
-    zipCode: 'DE-12345',
-    country: 'Berlin'
+    id: 'inspec_international_bv',
+    name: 'INSPEC International B.V.',
+    number: '2849',
+    address: 'Beechavenue 54, 1119 PW',
+    zipCode: 'Schiphol-Rijk',
+    country: 'Netherlands'
   },
   {
-    id: 'notified_body_bravo',
-    name: 'Institut Bravo',
-    number: '1122',
-    address: 'Rue Bravo 2',
-    zipCode: 'FR-75001',
-    country: 'Paris'
+    id: 'ricotest',
+    name: 'RICOTEST',
+    number: '0498',
+    address: 'Via Tione, 9',
+    zipCode: '37010 - Pastrengo (VR)',
+    country: 'Italy'
   },
   {
-    id: 'notified_body_charlie',
-    name: 'Charlie Certification AB',
-    number: '2233',
-    address: 'Charliegatan 3',
-    zipCode: 'SE-111 22',
-    country: 'Stockholm'
+    id: 'tuv_rheinland_lga_products_gmbh',
+    name: 'TÜV Rheinland LGA Products GmbH',
+    number: '0197',
+    address: 'Tillystraße 2',
+    zipCode: '90431 Nürnberg',
+    country: 'Germany'
   },
-  // TODO: Replace placeholders and add more notified bodies based on client's list
-  // Example format:
-  // {
-  //   id: 'another_body_id',
-  //   name: 'Another Notified Body Name',
-  //   number: '1234',
-  //   address: '123 Sample St',
-  //   zipCode: 'SE-123 45',
-  //   country: 'Stockholm'
-  // },
+  {
+    id: 'ccqs_certification_services_limited',
+    name: 'CCQS Certification Services Limited',
+    number: '2834',
+    address: 'Block 1 Blanchardstown Corporate Park, Ballycoolin Road, Blanchardstown, Dublin 15 D15 AKK1',
+    zipCode: 'Dublin',
+    country: 'Ireland'
+  },
+  {
+    id: 'din_certco_gesellschaft_fur_konformitatsbewertung_mbh',
+    name: 'DIN CERTCO GESELLSCHAFT FÜR KONFORMITÄTSBEWERTUNG MBH',
+    number: '0196',
+    address: 'Alboinstraße 56',
+    zipCode: '12103 BERLIN',
+    country: 'Germany'
+  }
 ]; 

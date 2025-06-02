@@ -77,6 +77,24 @@ export const translations: Record<string, Partial<Translations>> = {
   // Example:
   // no: { ... },
   // da: { ... },
+  is: {
+    docTitle: "ESB-SAMRÆMISYFIRLÝSING",
+    categoryLabel: "Flokkur:",
+    responsibilityStatement: "Þessi samræmisyfirlýsing er gefin út eingöngu á ábyrgð framleiðanda.",
+    ppeLabel: "Hlífðarbúnaðurinn sem lýst er hér að ofan er í samræmi við viðeigandi samhæfingarlöggjöf Sambandsins:",
+    itemNumberLabel: "Vörunúmer:",
+    conformityLegislationLabel: "er í samræmi við löggjöf",
+    harmonisedStandardsLabel: "og samræmda staðla",
+    euCertificateLabel: "ESB-gerðarprófunarvottorð nr.",
+    notifiedBodyNumberLabel: "Tilkynntur aðili nr.",
+    signatureTitle: "Ábyrgðarmaður vörugæða",
+    signatureNamePlaceholder: "Nafn undirritaðs",
+    footerWebsite: "www.bastadgruppen.com",
+    footerCompanyName: "Båstadgruppen AB",
+    footerPhoneNumber: "+46 431-732 00",
+    backToFormButton: "Til baka í eyðublað",
+    downloadPdfButton: "Hlaða niður PDF",
+  },
 };
 
 // Function to get translations for a specific language, falling back to English
@@ -113,4 +131,5 @@ export const availableLanguages: { code: string; name: string }[] = [
   { code: 'nl', name: 'Dutch' },
   { code: 'pt', name: 'Portuguese' }, // Corrected spelling
   { code: 'lv', name: 'Latvian' },
+  { code: 'is', name: 'Icelandic' },
 ]; 
