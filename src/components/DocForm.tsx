@@ -127,20 +127,107 @@ const DocumentPreview = ({
   const handleDownloadPDF = async () => {
     if (!documentRef.current) return;
 
-    const html2pdf = (await import("html2pdf.js")).default;
-
-    const element = documentRef.current;
-    const opt = {
-      margin: [5, 10, 0, 10], // [top, right, bottom, left] margins in mm
-      filename: `DOC-${formData.brandName || "Bastadgruppen"}-${
+    // First apply high contrast styling to ensure dark text
+    const contentElement = documentRef.current;
+    const contentClone = contentElement.cloneNode(true) as HTMLElement;
+    
+    // Apply forced dark text styling
+    const style = document.createElement('style');
+    style.innerHTML = `
+      * {
+        color: #000 !important;
+        text-shadow: none !important;
+        filter: none !important;
+        -webkit-text-stroke: none !important;
+      }
+      p, span, h1, h2, h3, h4, h5, h6, div {
+        color: #000 !important;
+        opacity: 1 !important;
+      }
+      img {
+        opacity: 1 !important;
+        filter: contrast(1.2) !important;
+      }
+      .text-gray-600 {
+        color: #000 !important;
+      }
+    `;
+    contentClone.appendChild(style);
+    
+    try {
+      // Import required libraries
+      const html2canvas = (await import("html2canvas")).default;
+      const { jsPDF } = await import("jspdf");
+      
+      const filename = `DOC-${formData.brandName || "Bastadgruppen"}-${
         formData.productName || "Declaration"
-      }-${formData.productCode.join("-") || "N/A"}.pdf`,
-      image: { type: "jpeg", quality: 1 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-    };
-
-    html2pdf().set(opt).from(element).save();
+      }-${formData.productCode.join("-") || "N/A"}.pdf`;
+      
+      // Temporarily append the clone to the document to render it correctly
+      contentClone.style.position = 'absolute';
+      contentClone.style.left = '-9999px';
+      document.body.appendChild(contentClone);
+      
+      // Create a new PDF document
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+      
+      // Process each language page
+      const pages = contentClone.querySelectorAll('.language-page');
+      
+      for (let i = 0; i < pages.length; i++) {
+        // If not the first page, add a new page to the PDF
+        if (i > 0) {
+          pdf.addPage();
+        }
+        
+        // Capture the current page as canvas
+        const canvas = await html2canvas(pages[i] as HTMLElement, {
+          scale: 3,
+          useCORS: true,
+          logging: false,
+          backgroundColor: "#ffffff",
+        });
+        
+        // Calculate dimensions to fit A4 while maintaining aspect ratio
+        const imgData = canvas.toDataURL('image/png');
+        const pageWidth = pdf.internal.pageSize.getWidth();
+        const pageHeight = pdf.internal.pageSize.getHeight();
+        
+        // Calculate the proper scaling to maintain aspect ratio
+        const canvasRatio = canvas.width / canvas.height;
+        const pageRatio = pageWidth / pageHeight;
+        
+        let imgWidth = pageWidth;
+        let imgHeight = imgWidth / canvasRatio;
+        
+        // If height exceeds page height, scale down based on height instead
+        if (imgHeight > pageHeight) {
+          imgHeight = pageHeight;
+          imgWidth = imgHeight * canvasRatio;
+        }
+        
+        // Center the image on the page
+        const xOffset = (pageWidth - imgWidth) / 2;
+        const yOffset = (pageHeight - imgHeight) / 2;
+        
+        // Add image to PDF with appropriate scaling and positioning
+        pdf.addImage(imgData, 'PNG', xOffset, yOffset, imgWidth, imgHeight);
+      }
+      
+      // Clean up the temporary element
+      document.body.removeChild(contentClone);
+      
+      // Save the PDF directly (this forces download without preview)
+      pdf.save(filename);
+      
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF. Please try again.');
+    }
   };
 
   const buttonLang = selectedLanguages[0] || "en";
@@ -148,207 +235,218 @@ const DocumentPreview = ({
 
   return (
     <div className="p-8 bg-surface h-full overflow-auto">
-      <div className="mb-4 flex justify-between print:hidden">
-        <button
-          onClick={() => setShowPreview(false)}
-          className="bg-surface-tertiary text-primary-700 py-2 px-4 rounded-md hover:bg-surface-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-30 transition-all duration-200 text-sm font-medium flex items-center gap-2 shadow-button"
+      <div className="flex justify-center items-start gap-x-4 print:block">
+        <div className="print:hidden sticky top-4 self-start flex-shrink-0 z-10">
+          <button
+            onClick={() => setShowPreview(false)}
+            className="bg-surface-tertiary text-primary-700 py-2 px-4 rounded-md hover:bg-surface-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-30 transition-all duration-200 text-sm font-medium flex items-center gap-2 shadow-button"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            {buttonT.backToFormButton}
+          </button>
+        </div>
+
+        <div
+          ref={documentRef}
+          className="flex-grow max-w-2xl min-w-0 print:border-0 print:shadow-none shadow-card bg-white rounded-lg overflow-hidden animate-fade-in print:mx-0 print:max-w-full print:flex-auto"
         >
-          <ArrowLeft className="w-4 h-4" />
-          {buttonT.backToFormButton}
-        </button>
-        <button
-          onClick={handleDownloadPDF}
-          className="bg-accent text-white py-2 px-4 rounded-md hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-30 transition-all duration-200 text-sm font-medium flex items-center gap-2 shadow-button hover:shadow-button-hover"
-        >
-          <Download className="w-4 h-4" />
-          {buttonT.downloadPdfButton}
-        </button>
-      </div>
-      <div
-        ref={documentRef}
-        className="max-w-2xl mx-auto print:border-0 print:shadow-none shadow-card bg-white rounded-lg overflow-hidden animate-fade-in"
-      >
-        {selectedLanguages.map((lang, index) => {
-          const t = getTranslations(lang);
-          return (
-            <div
-              key={lang}
-              className="p-6 language-page animate-slide-in-bottom"
-              style={{
-                pageBreakBefore: index > 0 ? "always" : "auto",
-                animationDelay: `${index * 100}ms`,
-              }}
-            >
-              <div className="flex justify-end mb-3">
-                <img
-                  src="/logo.png"
-                  alt="Båstadgruppen Logo"
-                  className="h-10"
-                />
-              </div>
-              <div className="flex">
-                <div className="w-6 bg-black h-10 mr-3"></div>
-                <div>
-                  <h1 className="text-lg font-bold">{t.docTitle}</h1>
-                  <p className="font-medium text-xs">
-                    {t.categoryLabel} {formData.categoryClass || "II"}
-                    {formData.categoryClass === "II" && " - Module B"}
-                    {formData.categoryClass === "III" &&
-                      formData.moduleType &&
-                      ` - ${formData.moduleType}`}
+          {selectedLanguages.map((lang, index) => {
+            const t = getTranslations(lang);
+            return (
+              <div
+                key={lang}
+                className="p-6 language-page animate-slide-in-bottom"
+                style={{
+                  pageBreakBefore: index > 0 ? "always" : "auto",
+                  animationDelay: `${index * 100}ms`,
+                }}
+              >
+                <div className="flex justify-end mb-3">
+                  <img
+                    src="/logo.png"
+                    alt="Båstadgruppen Logo"
+                    className="h-10"
+                  />
+                </div>
+                <div className="flex">
+                  <div className="w-6 bg-black h-10 mr-3"></div>
+                  <div>
+                    <h1 className="text-lg font-bold">{t.docTitle}</h1>
+                    <p className="font-medium text-xs">
+                      {t.categoryLabel} {formData.categoryClass || "II"}
+                      {formData.categoryClass === "II" && " - Module B"}
+                      {formData.categoryClass === "III" &&
+                        formData.moduleType &&
+                        ` - ${formData.moduleType}`}
+                    </p>
+                  </div>
+                </div>
+
+                <p className="my-3 text-sm">{t.responsibilityStatement}</p>
+
+                <p className="text-sm" style={{ marginBottom: "1px" }}>
+                  Båstadgruppen AB
+                </p>
+                <p className="text-sm" style={{ marginBottom: "1px" }}>
+                  Fraktgatan 1
+                </p>
+                <p className="text-sm" style={{ marginBottom: "1px" }}>
+                  262 73 Ängelholm
+                </p>
+                <p className="text-sm" style={{ marginBottom: "5px" }}>
+                  Sweden
+                </p>
+
+                <div className="my-4 text-center">
+                  <p
+                    className="mb-6 text-sm"
+                    dangerouslySetInnerHTML={{
+                      __html: t.ppeLabel.replace("\n", "<br />"),
+                    }}
+                  />
+
+                  {showBrandLogo && (
+                    <div className="flex justify-center my-3">
+                      <img src={brandLogo} alt="Brand Logo" className="h-10" />
+                    </div>
+                  )}
+
+                  <p className="font-bold text-lg my-1">
+                    {formData.productName || "Armet Safety Helmet"}
+                  </p>
+                  <p className="mb-1 text-sm">
+                    {t.itemNumberLabel}{" "}
+                    {formData.productCode.join(", ") || "1001933"}
                   </p>
                 </div>
-              </div>
 
-              <p className="my-3 text-sm">{t.responsibilityStatement}</p>
-
-              <p className="text-sm" style={{ marginBottom: "1px" }}>
-                Båstadgruppen AB
-              </p>
-              <p className="text-sm" style={{ marginBottom: "1px" }}>
-                Fraktgatan 1
-              </p>
-              <p className="text-sm" style={{ marginBottom: "1px" }}>
-                262 73 Ängelholm
-              </p>
-              <p className="text-sm" style={{ marginBottom: "5px" }}>
-                Sweden
-              </p>
-
-              <div className="my-4 text-center">
-                <p
-                  className="mb-6 text-sm"
-                  dangerouslySetInnerHTML={{
-                    __html: t.ppeLabel.replace("\n", "<br />"),
-                  }}
-                />
-
-                {showBrandLogo && (
-                  <div className="flex justify-center my-3">
-                    <img src={brandLogo} alt="Brand Logo" className="h-10" />
+                <p className="mb-3 text-sm">
+                  {t.conformityLegislationLabel}{" "}
+                  {formData.legislation[0] || "Regulation (EU) 2016/425"}{" "}
+                  {t.harmonisedStandardsLabel}
+                </p>
+                {formData.standards.length > 0 && formData.standards[0] !== "" ? (
+                  <div className="mb-3 text-sm">
+                    {formData.standards.map((standard, idx) => (
+                      <div key={idx} className="flex items-start">
+                        <span className="inline-block w-4 text-center mr-1">
+                          •
+                        </span>
+                        <span>{standard}</span>
+                      </div>
+                    ))}
                   </div>
+                ) : (
+                  <p className="mb-3 text-sm pl-5">
+                    EN ISO 21420: 2020, EN 388:2016 + A1:2018 M.
+                  </p>
                 )}
 
-                <p className="font-bold text-lg my-1">
-                  {formData.productName || "Armet Safety Helmet"}
-                </p>
-                <p className="mb-1 text-sm">
-                  {t.itemNumberLabel}{" "}
-                  {formData.productCode.join(", ") || "1001933"}
-                </p>
-              </div>
+                {(() => {
+                  const notifiedBodyName =
+                    formData.notifiedBodyName || "SGS Fimko Ltd.";
+                  const notifiedBodyNumber =
+                    formData.notifiedBodyNumber || "0598";
+                  const certificateNumberVal =
+                    formData.certificateNumber || "BP 60132703";
+                  const notifiedBodyInfoStr = `${notifiedBodyName} (No ${notifiedBodyNumber})`;
+                  let statement = "";
 
-              <p className="mb-3 text-sm">
-                {t.conformityLegislationLabel}{" "}
-                {formData.legislation[0] || "Regulation (EU) 2016/425"}{" "}
-                {t.harmonisedStandardsLabel}
-              </p>
-              {formData.standards.length > 0 && formData.standards[0] !== "" ? (
-                <div className="mb-3 text-sm">
-                  {formData.standards.map((standard, idx) => (
-                    <div key={idx} className="flex items-start">
-                      <span className="inline-block w-4 text-center mr-1">
-                        •
-                      </span>
-                      <span>{standard}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <p className="mb-3 text-sm pl-5">
-                  EN ISO 21420: 2020, EN 388:2016 + A1:2018 M.
-                </p>
-              )}
-
-              {(() => {
-                const notifiedBodyName =
-                  formData.notifiedBodyName || "SGS Fimko Ltd.";
-                const notifiedBodyNumber =
-                  formData.notifiedBodyNumber || "0598";
-                const certificateNumberVal =
-                  formData.certificateNumber || "BP 60132703";
-                const notifiedBodyInfoStr = `${notifiedBodyName} (No ${notifiedBodyNumber})`;
-                let statement = "";
-
-                if (formData.categoryClass === "I") {
-                  statement = `${t.euCertificateLabel} ${certificateNumberVal}`;
-                } else if (formData.categoryClass === "II") {
-                  statement = `The notified body "${notifiedBodyInfoStr}" performed the EU type-examination (Module B) and issued the EU type-examination certificate "${certificateNumberVal}".`;
-                } else if (formData.categoryClass === "III") {
-                  const baseStatement = `The notified body "${notifiedBodyInfoStr}" performed the EU type-examination (Module B) and issued the EU type-examination certificate "${certificateNumberVal}".`;
-                  if (formData.moduleType === "Module C2") {
-                    statement = `${baseStatement} The PPE is subject to the conformity assessment procedure based on internal production control plus supervised product checks at random intervals (Module C2) under surveillance of the notified body "${notifiedBodyInfoStr}".`;
-                  } else if (formData.moduleType === "Module D") {
-                    statement = `${baseStatement} The PPE is subject to the conformity assessment procedure based on quality assurance of the production process (Module D) under surveillance of the notified body "${notifiedBodyInfoStr}".`;
+                  if (formData.categoryClass === "I") {
+                    if (formData.certificateNumber) {
+                      statement = `${t.simpleCertificateLabel || "Certificate:"} ${formData.certificateNumber}`;
+                    } else {
+                      statement = "";
+                    }
+                  } else if (formData.categoryClass === "II") {
+                    statement = `${t.text_theNotifiedBody || "The notified body"} "${notifiedBodyInfoStr}" ${t.text_performedEUExam || "performed the EU type-examination (Module B) and issued the EU type-examination certificate"} "${certificateNumberVal}".`;
+                  } else if (formData.categoryClass === "III") {
+                    const baseStatement = `${t.text_theNotifiedBody || "The notified body"} "${notifiedBodyInfoStr}" ${t.text_performedEUExam || "performed the EU type-examination (Module B) and issued the EU type-examination certificate"} "${certificateNumberVal}".`;
+                    if (formData.moduleType === "Module C2") {
+                      statement = `${baseStatement} ${t.text_ppeSubjectToModuleC2 || "The PPE is subject to the conformity assessment procedure based on internal production control plus supervised product checks at random intervals (Module C2) under surveillance of the notified body"} "${notifiedBodyInfoStr}".`;
+                    } else if (formData.moduleType === "Module D") {
+                      statement = `${baseStatement} ${t.text_ppeSubjectToModuleD || "The PPE is subject to the conformity assessment procedure based on quality assurance of the production process (Module D) under surveillance of the notified body"} "${notifiedBodyInfoStr}".`;
+                    } else {
+                      statement = baseStatement;
+                    }
                   } else {
-                    // Fallback for Category III if moduleType is unexpected or not set (form validation should usually prevent the latter)
-                    statement = baseStatement;
+                    if (formData.certificateNumber) {
+                       statement = `${t.simpleCertificateLabel || "Certificate:"} ${certificateNumberVal}`;
+                    } else {
+                      statement = "";
+                    }
                   }
-                } else {
-                  // Fallback for cases where categoryClass might be empty or unexpected, though form validation should prevent this.
-                  statement = `${t.euCertificateLabel} ${certificateNumberVal}`;
-                }
-                return <p className="mb-6 text-sm">{statement}</p>;
-              })()}
+                  return statement ? <p className="mb-6 text-sm">{statement}</p> : null;
+                })()}
 
-              <div className="flex justify-between items-start mb-3">
-                <div className="text-sm">
-                  <p className="mb-1">
-                    {formData.notifiedBodyName || "SGS Fimko Ltd."}
-                  </p>
-                  <p className="mb-1">
-                    {t.notifiedBodyNumberLabel}{" "}
-                    {formData.notifiedBodyNumber || "0598"}
-                  </p>
-                  <p className="mb-1">
-                    {formData.notifiedBodyAddress || "Takomotie 8"}
-                  </p>
-                  <p>
-                    {formData.notifiedBodyZipCode || "FI - 00380"}{" "}
-                    {formData.notifiedBodyCountry || "Helsinki"}
-                  </p>
+                <div className="flex justify-between items-start mb-3">
+                  <div className="text-sm">
+                    <p className="mb-1">
+                      {formData.notifiedBodyName || "SGS Fimko Ltd."}
+                    </p>
+                    <p className="mb-1">
+                      {t.notifiedBodyNumberLabel}{" "}
+                      {formData.notifiedBodyNumber || "0598"}
+                    </p>
+                    <p className="mb-1">
+                      {formData.notifiedBodyAddress || "Takomotie 8"}
+                    </p>
+                    <p>
+                      {formData.notifiedBodyZipCode || "FI - 00380"}{" "}
+                      {formData.notifiedBodyCountry || "Helsinki"}
+                    </p>
+                  </div>
+
+                  <div className="text-right text-sm">
+                    {showSignature ? (
+                      <>
+                        <div className="h-9 mb-1 flex justify-end">
+                          <img
+                            src={signatureImage}
+                            alt="Signature"
+                            className="h-full"
+                          />
+                        </div>
+                        <p className="mb-1">{t.signatureTitle}</p>
+                        <p className="mb-1">{signatureData?.name}</p>
+                        <p>{formatDate(new Date())}</p>
+                      </>
+                    ) : (
+                      <>
+                        <div className="h-9 mb-1"></div>
+                        <p className="mb-1">{t.signatureTitle}</p>
+                        <p className="mb-1">
+                          {signatureData?.name || t.signatureNamePlaceholder}
+                        </p>
+                        <p>{formatDate(new Date())}</p>
+                      </>
+                    )}
+                  </div>
                 </div>
 
-                <div className="text-right text-sm">
-                  {showSignature ? (
-                    <>
-                      <div className="h-9 mb-1 flex justify-end">
-                        <img
-                          src={signatureImage}
-                          alt="Signature"
-                          className="h-full"
-                        />
-                      </div>
-                      <p className="mb-1">{t.signatureTitle}</p>
-                      <p className="mb-1">{signatureData?.name}</p>
-                      <p>{formatDate(new Date())}</p>
-                    </>
-                  ) : (
-                    <>
-                      <div className="h-9 mb-1"></div>
-                      <p className="mb-1">{t.signatureTitle}</p>
-                      <p className="mb-1">
-                        {signatureData?.name || t.signatureNamePlaceholder}
-                      </p>
-                      <p>{formatDate(new Date())}</p>
-                    </>
-                  )}
+                <div className="pt-10 mt-1 flex justify-between items-center text-xs text-gray-600">
+                  <a
+                    href="https://www.bastadgruppen.com"
+                    className="text-blue-600 hover:underline"
+                  >
+                    {t.footerWebsite}
+                  </a>
+                  <span>{t.footerCompanyName}</span>
+                  <span>{t.footerPhoneNumber}</span>
                 </div>
               </div>
-
-              <div className="pt-10 mt-1 flex justify-between items-center text-xs text-gray-600">
-                <a
-                  href="https://www.bastadgruppen.com"
-                  className="text-blue-600 hover:underline"
-                >
-                  {t.footerWebsite}
-                </a>
-                <span>{t.footerCompanyName}</span>
-                <span>{t.footerPhoneNumber}</span>
-              </div>
-            </div>
-          );
-        })}
+            );
+          })}
+        </div>
+        <div className="print:hidden sticky top-4 self-start flex-shrink-0 z-10">
+          <button
+            onClick={handleDownloadPDF}
+            className="bg-accent text-white py-2 px-4 rounded-md hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-30 transition-all duration-200 text-sm font-medium flex items-center gap-2 shadow-button hover:shadow-button-hover"
+          >
+            <Download className="w-4 h-4" />
+            {buttonT.downloadPdfButton}
+          </button>
+        </div>
       </div>
     </div>
   );
