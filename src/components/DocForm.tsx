@@ -80,6 +80,7 @@ export interface DocFormData {
   categoryClass: string;
   moduleType: string;
   selectedNotifiedBodyId: string;
+  showCertificateNumber?: boolean;
 }
 
 const DocumentPreview = ({
@@ -353,7 +354,7 @@ const DocumentPreview = ({
                   let statement = "";
 
                   if (formData.categoryClass === "I") {
-                    if (formData.certificateNumber) {
+                    if (formData.certificateNumber && formData.showCertificateNumber !== false) {
                       statement = `${t.simpleCertificateLabel || "Certificate:"} ${formData.certificateNumber}`;
                     } else {
                       statement = "";
@@ -481,6 +482,7 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
     categoryClass: "",
     moduleType: "",
     selectedNotifiedBodyId: "",
+    showCertificateNumber: true,
   };
 
   const [formData, setFormData] = useState<DocFormData>(() => {
@@ -571,15 +573,23 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
     const value = e.target.value;
 
     if (field === "notifiedBodySelect") {
-      setFormData((prev) => ({
-        ...prev,
-        selectedNotifiedBodyId: value,
-        notifiedBodyName: "",
-        notifiedBodyNumber: "",
-        notifiedBodyAddress: "",
-        notifiedBodyZipCode: "",
-        notifiedBodyCountry: "",
-      }));
+      const selectedBody = notifiedBodies.find((body) => body.id === value);
+      if (selectedBody) {
+        setFormData({
+          ...formData,
+          selectedNotifiedBodyId: value,
+          notifiedBodyName: selectedBody.name || "",
+          notifiedBodyNumber: selectedBody.number || "",
+          notifiedBodyAddress: selectedBody.address || "",
+          notifiedBodyZipCode: selectedBody.zipCode || "",
+          notifiedBodyCountry: selectedBody.country || "",
+        });
+      }
+    } else if (field === "showCertificateNumber") {
+      setFormData({
+        ...formData,
+        showCertificateNumber: value === "yes",
+      });
     } else {
       const brandLogoMap: Record<string, string> = {
         Guardio: "/brands/guardio.png",
@@ -719,7 +729,7 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
       );
       return;
     }
-    if (!formData.certificateNumber) {
+    if (!formData.certificateNumber && (formData.categoryClass !== "I" || formData.showCertificateNumber !== false)) {
       alert("Please enter the Certificate Number.");
       return;
     }
@@ -1211,6 +1221,35 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
                     <option value="Module C2">Module C2</option>
                     <option value="Module D">Module D</option>
                   </select>
+                </div>
+              )}
+
+              {formData.categoryClass === "I" && (
+                <div>
+                  <div className="flex items-center">
+                    <div className="flex h-6 items-center">
+                      <input
+                        id="showCertificateNumber"
+                        type="checkbox"
+                        checked={formData.showCertificateNumber !== false}
+                        onChange={(e) => {
+                          setFormData({
+                            ...formData,
+                            showCertificateNumber: e.target.checked
+                          });
+                        }}
+                        className={checkboxClassName}
+                      />
+                    </div>
+                    <div className="ml-3 text-sm leading-6">
+                      <label
+                        htmlFor="showCertificateNumber"
+                        className="font-medium text-primary-800"
+                      >
+                        Add Certificate No.
+                      </label>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
