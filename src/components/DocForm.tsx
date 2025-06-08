@@ -357,7 +357,7 @@ const DocumentPreview = ({
                     if (formData.certificateNumber && formData.showCertificateNumber !== false) {
                       statement = `${t.simpleCertificateLabel || "Certificate:"} ${formData.certificateNumber}`;
                     } else {
-                      statement = "";
+                      statement = "\u00A0";
                     }
                   } else if (formData.categoryClass === "II") {
                     statement = `${t.text_theNotifiedBody || "The notified body"} "${notifiedBodyInfoStr}" ${t.text_performedEUExam || "performed the EU type-examination (Module B) and issued the EU type-examination certificate"} "${certificateNumberVal}".`;
@@ -377,7 +377,7 @@ const DocumentPreview = ({
                       statement = "";
                     }
                   }
-                  return statement ? <p className="mb-6 text-sm">{statement}</p> : null;
+                  return <p className="mb-6 text-sm">{statement}</p>;
                 })()}
 
                 <div className="flex justify-between items-start mb-3">

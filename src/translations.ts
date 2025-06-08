@@ -108,15 +108,21 @@ export const translations: Record<string, Partial<Translations>> = {
     categoryLabel: "Flokkur:",
     responsibilityStatement:
       "Þessi samræmisyfirlýsing er gefin út eingöngu á ábyrgð framleiðanda.",
+    manufacturerAddressLabel: "Båstadgruppen AB",
     ppeLabel:
-      "Hlífðarbúnaðurinn sem lýst er hér að ofan er í samræmi við viðeigandi samhæfingarlöggjöf Sambandsins:",
+      "Framleiðandi lýsir því hér með yfir að eftirfarandi persónuhlífar:",
+    ppeNameLabel: "Vöruheiti",
     itemNumberLabel: "Vörunúmer:",
     conformityLegislationLabel: "er í samræmi við löggjöf",
     harmonisedStandardsLabel: "og samræmda staðla",
-    euCertificateLabel: "ESB-gerðarprófunarvottorð nr.", // Icelandic version was simpler.
+    euCertificateLabel: "ESB-gerðarprófunarvottorð nr.",
+    notifiedBodySectionLabel: "Upplýsingar um tilkynntan aðila",
+    notifiedBodyLabel: "Nafn tilkynnts aðila",
     notifiedBodyNumberLabel: "Tilkynntur aðili nr.",
+    issuedByLabel: "gefið út af",
     signatureTitle: "Ábyrgðarmaður vörugæða",
     signatureNamePlaceholder: "Nafn undirritaðs",
+    signatureDateLabel: "Dagsetning",
     footerWebsite: "www.bastadgruppen.com",
     footerCompanyName: "Båstadgruppen AB",
     footerPhoneNumber: "+46 431-732 00",
@@ -206,10 +212,348 @@ export const translations: Record<string, Partial<Translations>> = {
     text_ppeSubjectToModuleD:
       "PV er underlagt overensstemmelsesvurderingsproceduren baseret på kvalitetssikring af produktionsprocessen (Modul D) under tilsyn af det bemyndigede organ",
   },
-  // Add entries for 'fi', 'pl', 'et', 'de', 'fr', 'it', 'nl', 'pt', 'lv'
-  // Example:
-  // no: { ... },
-  // da: { ... },
+  fi: {
+    docTitle: "EU-vaatimustenmukaisuusvakuutus",
+    categoryLabel: "Kategoria",
+    responsibilityStatement:
+      "Tämä vaatimustenmukaisuusvakuutus on annettu valmistajan yksinomaisella vastuulla:",
+    manufacturerAddressLabel: "Båstadgruppen AB",
+    ppeLabel:
+      "Valmistaja vakuuttaa täten, että seuraava henkilönsuojain:",
+    ppeNameLabel: "Tuotenimi",
+    itemNumberLabel: "tuotenumerolla",
+    conformityLegislationLabel:
+      "on asiaa koskevan unionin yhdenmukaistamislainsäädännön mukainen:",
+    harmonisedStandardsLabel:
+      "ja täyttää liitteessä II säädetyt sovellettavat olennaiset terveys- ja turvallisuusvaatimukset sekä asiaankuuluvat yhdenmukaistetut standardit tai muut tekniset eritelmät, nro:",
+    euCertificateLabel:
+      "EU-tyyppitarkastustodistus (moduuli B) ja myönsi EU-tyyppitarkastustodistuksen nro.",
+    notifiedBodySectionLabel: "Ilmoitetun laitoksen tiedot",
+    notifiedBodyLabel: "Ilmoitetun laitoksen nimi",
+    notifiedBodyNumberLabel: "Ilmoitettu laitos nro.",
+    issuedByLabel: "myöntänyt",
+    signatureTitle: "Tuotepäällikkö, Turvallisuus",
+    signatureNamePlaceholder: "Anders Andersson",
+    signatureDateLabel: "Päiväys",
+    backToFormButton: "Takaisin lomakkeeseen",
+    downloadPdfButton: "Lataa PDF",
+    footerWebsite: "www.bastadgruppen.com",
+    footerCompanyName: "Båstadgruppen AB",
+    footerPhoneNumber: "0046123413445",
+    // New Finnish translations
+    simpleCertificateLabel: "Todistus:",
+    text_theNotifiedBody: "Ilmoitettu laitos",
+    text_performedEUExam:
+      "suoritti EU-tyyppitarkastuksen (moduuli B) ja myönsi EU-tyyppitarkastustodistuksen",
+    text_ppeSubjectToModuleC2:
+      "Henkilönsuojaimeen sovelletaan vaatimustenmukaisuuden arviointimenettelyä, joka perustuu sisäiseen tuotannonvalvontaan ja satunnaisin väliajoin tapahtuviin valvottuihin tuotetarkastuksiin (moduuli C2) ilmoitetun laitoksen valvonnassa",
+    text_ppeSubjectToModuleD:
+      "Henkilönsuojaimeen sovelletaan vaatimustenmukaisuuden arviointimenettelyä, joka perustuu tuotantoprosessin laadunvarmistukseen (moduuli D) ilmoitetun laitoksen valvonnassa",
+  },
+  pl: {
+    docTitle: "Deklaracja zgodności UE",
+    categoryLabel: "Kategoria",
+    responsibilityStatement:
+      "Niniejsza deklaracja zgodności wydana zostaje na wyłączną odpowiedzialność producenta:",
+    manufacturerAddressLabel: "Båstadgruppen AB",
+    ppeLabel:
+      "Producent niniejszym oświadcza, że poniżej opisany środek ochrony indywidualnej (ŚOI):",
+    ppeNameLabel: "Nazwa produktu",
+    itemNumberLabel: "o numerze artykułu",
+    conformityLegislationLabel:
+      "jest zgodny z odpowiednimi wymaganiami unijnego prawodawstwa harmonizacyjnego:",
+    harmonisedStandardsLabel:
+      "i spełnia mające zastosowanie zasadnicze wymagania dotyczące zdrowia i bezpieczeństwa określone w załączniku II oraz odpowiednie normy zharmonizowane lub inne specyfikacje techniczne, nr:",
+    euCertificateLabel:
+      "Certyfikat badania typu UE (Moduł B) i wydał certyfikat badania typu UE nr",
+    notifiedBodySectionLabel: "Informacje o jednostce notyfikowanej",
+    notifiedBodyLabel: "Nazwa jednostki notyfikowanej",
+    notifiedBodyNumberLabel: "Jednostka notyfikowana nr",
+    issuedByLabel: "wydany przez",
+    signatureTitle: "Kierownik Produktu ds. Bezpieczeństwa",
+    signatureNamePlaceholder: "Anders Andersson",
+    signatureDateLabel: "Data",
+    backToFormButton: "Powrót do formularza",
+    downloadPdfButton: "Pobierz PDF",
+    footerWebsite: "www.bastadgruppen.com",
+    footerCompanyName: "Båstadgruppen AB",
+    footerPhoneNumber: "0046123413445",
+    // New Polish translations
+    simpleCertificateLabel: "Certyfikat:",
+    text_theNotifiedBody: "Jednostka notyfikowana",
+    text_performedEUExam:
+      "przeprowadziła badanie typu UE (Moduł B) i wydała certyfikat badania typu UE",
+    text_ppeSubjectToModuleC2:
+      "ŚOI podlega procedurze oceny zgodności w oparciu o wewnętrzną kontrolę produkcji oraz nadzorowane kontrole produktu w losowych odstępach czasu (Moduł C2) pod nadzorem jednostki notyfikowanej",
+    text_ppeSubjectToModuleD:
+      "ŚOI podlega procedurze oceny zgodności w oparciu o zapewnienie jakości procesu produkcji (Moduł D) pod nadzorem jednostki notyfikowanej",
+  },
+  et: {
+    docTitle: "EL-i vastavusdeklaratsioon",
+    categoryLabel: "Kategooria",
+    responsibilityStatement:
+      "Käesolev vastavusdeklaratsioon on väljastatud tootja ainuvastutusel:",
+    manufacturerAddressLabel: "Båstadgruppen AB",
+    ppeLabel:
+      "Tootja kinnitab käesolevaga, et allpool kirjeldatud isikukaitsevahend:",
+    ppeNameLabel: "Toote nimetus",
+    itemNumberLabel: "artiklinumbriga",
+    conformityLegislationLabel:
+      "vastab asjakohasele liidu ühtlustamisõigusaktile:",
+    harmonisedStandardsLabel:
+      "ja vastab II lisas sätestatud kohaldatavatele olulistele tervisekaitse- ja ohutusnõuetele ning asjakohastele harmoneeritud standarditele või muudele tehnilistele spetsifikatsioonidele, nr:",
+    euCertificateLabel:
+      "EL-i tüübihindamistõend (moodul B) ja andis välja EL-i tüübihindamistõendi nr",
+    notifiedBodySectionLabel: "Teavitatud asutuse teave",
+    notifiedBodyLabel: "Teavitatud asutuse nimi",
+    notifiedBodyNumberLabel: "Teavitatud asutus nr",
+    issuedByLabel: "väljastatud",
+    signatureTitle: "Tootejuht, Ohutus",
+    signatureNamePlaceholder: "Anders Andersson",
+    signatureDateLabel: "Kuupäev",
+    backToFormButton: "Tagasi vormile",
+    downloadPdfButton: "Laadi alla PDF",
+    footerWebsite: "www.bastadgruppen.com",
+    footerCompanyName: "Båstadgruppen AB",
+    footerPhoneNumber: "0046123413445",
+    // New Estonian translations
+    simpleCertificateLabel: "Sertifikaat:",
+    text_theNotifiedBody: "Teavitatud asutus",
+    text_performedEUExam:
+      "teostas EL-i tüübihindamise (moodul B) ja väljastas EL-i tüübihindamistõendi",
+    text_ppeSubjectToModuleC2:
+      "Isikukaitsevahendi suhtes kohaldatakse vastavushindamismenetlust, mis põhineb tootmise sisekontrollil ning juhuslike ajavahemike järel toimuval toodete kontrollil (moodul C2) teavitatud asutuse järelevalve all",
+    text_ppeSubjectToModuleD:
+      "Isikukaitsevahendi suhtes kohaldatakse vastavushindamismenetlust, mis põhineb tootmisprotsessi kvaliteedi tagamisel (moodul D) teavitatud asutuse järelevalve all",
+  },
+  de: {
+    docTitle: "EU-Konformitätserklärung",
+    categoryLabel: "Kategorie",
+    responsibilityStatement:
+      "Diese Konformitätserklärung wird unter der alleinigen Verantwortung des Herstellers ausgestellt:",
+    manufacturerAddressLabel: "Båstadgruppen AB",
+    ppeLabel:
+      "Der Hersteller erklärt hiermit, dass die nachfolgend beschriebene persönliche Schutzausrüstung (PSA):",
+    ppeNameLabel: "Produktname",
+    itemNumberLabel: "mit Artikelnummer",
+    conformityLegislationLabel:
+      "mit den einschlägigen Harmonisierungsrechtsvorschriften der Union konform ist:",
+    harmonisedStandardsLabel:
+      "und die geltenden grundlegenden Gesundheitsschutz- und Sicherheitsanforderungen gemäß Anhang II sowie die einschlägigen harmonisierten Normen oder anderen technischen Spezifikationen, Nr.:",
+    euCertificateLabel:
+      "EU-Baumusterprüfbescheinigung (Modul B) und stellte die EU-Baumusterprüfbescheinigung Nr. aus",
+    notifiedBodySectionLabel: "Informationen zur notifizierten Stelle",
+    notifiedBodyLabel: "Name der notifizierten Stelle",
+    notifiedBodyNumberLabel: "Notifizierte Stelle Nr.",
+    issuedByLabel: "ausgestellt durch",
+    signatureTitle: "Produktmanager Sicherheit",
+    signatureNamePlaceholder: "Anders Andersson",
+    signatureDateLabel: "Datum",
+    backToFormButton: "Zurück zum Formular",
+    downloadPdfButton: "PDF herunterladen",
+    footerWebsite: "www.bastadgruppen.com",
+    footerCompanyName: "Båstadgruppen AB",
+    footerPhoneNumber: "0046123413445",
+    // New German translations
+    simpleCertificateLabel: "Zertifikat:",
+    text_theNotifiedBody: "Die notifizierte Stelle",
+    text_performedEUExam:
+      "führte die EU-Baumusterprüfung (Modul B) durch und stellte die EU-Baumusterprüfbescheinigung aus",
+    text_ppeSubjectToModuleC2:
+      "Die PSA unterliegt dem Konformitätsbewertungsverfahren auf Grundlage einer internen Fertigungskontrolle mit überwachten Produktprüfungen in unregelmäßigen Abständen (Modul C2) unter Überwachung der notifizierten Stelle",
+    text_ppeSubjectToModuleD:
+      "Die PSA unterliegt dem Konformitätsbewertungsverfahren auf Grundlage einer Qualitätssicherung bezogen auf den Produktionsprozess (Modul D) unter Überwachung der notifizierten Stelle",
+  },
+  fr: {
+    docTitle: "Déclaration UE de conformité",
+    categoryLabel: "Catégorie",
+    responsibilityStatement:
+      "La présente déclaration de conformité est établie sous la seule responsabilité du fabricant :",
+    manufacturerAddressLabel: "Båstadgruppen AB",
+    ppeLabel:
+      "Le fabricant déclare par la présente que l'équipement de protection individuelle (EPI) décrit ci-dessous :",
+    ppeNameLabel: "Nom du produit",
+    itemNumberLabel: "avec numéro d'article",
+    conformityLegislationLabel:
+      "est conforme à la législation d'harmonisation de l'Union applicable :",
+    harmonisedStandardsLabel:
+      "et satisfait aux exigences essentielles de santé et de sécurité applicables énoncées à l'annexe II et aux normes harmonisées ou autres spécifications techniques pertinentes, n° :",
+    euCertificateLabel:
+      "Attestation d'examen UE de type (module B) et a délivré l'attestation d'examen UE de type n°",
+    notifiedBodySectionLabel: "Informations sur l'organisme notifié",
+    notifiedBodyLabel: "Nom de l'organisme notifié",
+    notifiedBodyNumberLabel: "Organisme notifié n°",
+    issuedByLabel: "délivré par",
+    signatureTitle: "Responsable Produit Sécurité",
+    signatureNamePlaceholder: "Anders Andersson",
+    signatureDateLabel: "Date",
+    backToFormButton: "Retour au formulaire",
+    downloadPdfButton: "Télécharger le PDF",
+    footerWebsite: "www.bastadgruppen.com",
+    footerCompanyName: "Båstadgruppen AB",
+    footerPhoneNumber: "0046123413445",
+    // New French translations
+    simpleCertificateLabel: "Certificat :",
+    text_theNotifiedBody: "L'organisme notifié",
+    text_performedEUExam:
+      "a effectué l'examen UE de type (module B) et a délivré l'attestation d'examen UE de type",
+    text_ppeSubjectToModuleC2:
+      "L'EPI est soumis à la procédure d'évaluation de la conformité fondée sur le contrôle interne de la production et à des contrôles supervisés du produit à des intervalles aléatoires (module C2) sous la surveillance de l'organisme notifié",
+    text_ppeSubjectToModuleD:
+      "L'EPI est soumis à la procédure d'évaluation de la conformité fondée sur l'assurance de la qualité du mode de production (module D) sous la surveillance de l'organisme notifié",
+  },
+  it: {
+    docTitle: "Dichiarazione di conformità UE",
+    categoryLabel: "Categoria",
+    responsibilityStatement:
+      "La presente dichiarazione di conformità è rilasciata sotto la responsabilità esclusiva del fabbricante:",
+    manufacturerAddressLabel: "Båstadgruppen AB",
+    ppeLabel:
+      "Il fabbricante dichiara con la presente che il seguente dispositivo di protezione individuale (DPI):",
+    ppeNameLabel: "Nome del prodotto",
+    itemNumberLabel: "con numero di articolo",
+    conformityLegislationLabel:
+      "è conforme alla pertinente normativa di armonizzazione dell'Unione:",
+    harmonisedStandardsLabel:
+      "e soddisfa i requisiti essenziali di salute e sicurezza applicabili di cui all'allegato II e le pertinenti norme armonizzate o altre specifiche tecniche, n.:",
+    euCertificateLabel:
+      "Certificato di esame UE del tipo (Modulo B) e ha rilasciato il certificato di esame UE del tipo n.",
+    notifiedBodySectionLabel: "Informazioni sull'organismo notificato",
+    notifiedBodyLabel: "Nome dell'organismo notificato",
+    notifiedBodyNumberLabel: "Organismo notificato n.",
+    issuedByLabel: "rilasciato da",
+    signatureTitle: "Responsabile Prodotto Sicurezza",
+    signatureNamePlaceholder: "Anders Andersson",
+    signatureDateLabel: "Data",
+    backToFormButton: "Torna al modulo",
+    downloadPdfButton: "Scarica PDF",
+    footerWebsite: "www.bastadgruppen.com",
+    footerCompanyName: "Båstadgruppen AB",
+    footerPhoneNumber: "0046123413445",
+    // New Italian translations
+    simpleCertificateLabel: "Certificato:",
+    text_theNotifiedBody: "L'organismo notificato",
+    text_performedEUExam:
+      "ha effettuato l'esame UE del tipo (Modulo B) e ha rilasciato il certificato di esame UE del tipo",
+    text_ppeSubjectToModuleC2:
+      "Il DPI è oggetto della procedura di valutazione della conformità basata sul controllo interno della produzione unito a prove del prodotto sotto controllo ufficiale effettuate ad intervalli casuali (Modulo C2) sotto la sorveglianza dell'organismo notificato",
+    text_ppeSubjectToModuleD:
+      "Il DPI è oggetto della procedura di valutazione della conformità basata sulla garanzia di qualità del processo di produzione (Modulo D) sotto la sorveglianza dell'organismo notificato",
+  },
+  nl: {
+    docTitle: "EU-conformiteitsverklaring",
+    categoryLabel: "Categorie",
+    responsibilityStatement:
+      "Deze conformiteitsverklaring wordt op eigen verantwoordelijkheid van de fabrikant verstrekt:",
+    manufacturerAddressLabel: "Båstadgruppen AB",
+    ppeLabel:
+      "De fabrikant verklaart hierbij dat het hieronder beschreven persoonlijk beschermingsmiddel (PBM):",
+    ppeNameLabel: "Productnaam",
+    itemNumberLabel: "met artikelnummer",
+    conformityLegislationLabel:
+      "in overeenstemming is met de relevante harmonisatiewetgeving van de Unie:",
+    harmonisedStandardsLabel:
+      "en voldoet aan de toepasselijke essentiële gezondheids- en veiligheidseisen zoals uiteengezet in bijlage II en de relevante geharmoniseerde normen of andere technische specificaties, nr.:",
+    euCertificateLabel:
+      "EU-typeonderzoekscertificaat (module B) en heeft het EU-typeonderzoekscertificaat nr. afgegeven",
+    notifiedBodySectionLabel: "Informatie over de aangemelde instantie",
+    notifiedBodyLabel: "Naam van de aangemelde instantie",
+    notifiedBodyNumberLabel: "Aangemelde instantie nr.",
+    issuedByLabel: "afgegeven door",
+    signatureTitle: "Productmanager Veiligheid",
+    signatureNamePlaceholder: "Anders Andersson",
+    signatureDateLabel: "Datum",
+    backToFormButton: "Terug naar formulier",
+    downloadPdfButton: "PDF downloaden",
+    footerWebsite: "www.bastadgruppen.com",
+    footerCompanyName: "Båstadgruppen AB",
+    footerPhoneNumber: "0046123413445",
+    // New Dutch translations
+    simpleCertificateLabel: "Certificaat:",
+    text_theNotifiedBody: "De aangemelde instantie",
+    text_performedEUExam:
+      "heeft het EU-typeonderzoek (module B) uitgevoerd en het EU-typeonderzoekscertificaat afgegeven",
+    text_ppeSubjectToModuleC2:
+      "Het PBM is onderworpen aan de conformiteitsbeoordelingsprocedure op basis van interne productiecontrole plus productcontroles onder toezicht met willekeurige tussenpozen (module C2) onder toezicht van de aangemelde instantie",
+    text_ppeSubjectToModuleD:
+      "Het PBM is onderworpen aan de conformiteitsbeoordelingsprocedure op basis van kwaliteitsborging van het productieproces (module D) onder toezicht van de aangemelde instantie",
+  },
+  pt: {
+    docTitle: "Declaração UE de conformidade",
+    categoryLabel: "Categoria",
+    responsibilityStatement:
+      "A presente declaração de conformidade é emitida sob a exclusiva responsabilidade do fabricante:",
+    manufacturerAddressLabel: "Båstadgruppen AB",
+    ppeLabel:
+      "O fabricante declara pelo presente que o equipamento de proteção individual (EPI) descrito abaixo:",
+    ppeNameLabel: "Nome do produto",
+    itemNumberLabel: "com número de artigo",
+    conformityLegislationLabel:
+      "está em conformidade com a legislação de harmonização da União aplicável:",
+    harmonisedStandardsLabel:
+      "e cumpre os requisitos essenciais de saúde e segurança aplicáveis estabelecidos no Anexo II e nas normas harmonizadas relevantes ou outras especificações técnicas, N.º:",
+    euCertificateLabel:
+      "Certificado de exame UE de tipo (Módulo B) e emitiu o certificado de exame UE de tipo n.º",
+    notifiedBodySectionLabel: "Informações sobre o organismo notificado",
+    notifiedBodyLabel: "Nome do organismo notificado",
+    notifiedBodyNumberLabel: "Organismo notificado n.º",
+    issuedByLabel: "emitido por",
+    signatureTitle: "Gestor de Produto Segurança",
+    signatureNamePlaceholder: "Anders Andersson",
+    signatureDateLabel: "Data",
+    backToFormButton: "Voltar ao formulário",
+    downloadPdfButton: "Descarregar PDF",
+    footerWebsite: "www.bastadgruppen.com",
+    footerCompanyName: "Båstadgruppen AB",
+    footerPhoneNumber: "0046123413445",
+    // New Portuguese translations
+    simpleCertificateLabel: "Certificado:",
+    text_theNotifiedBody: "O organismo notificado",
+    text_performedEUExam:
+      "realizou o exame UE de tipo (Módulo B) e emitiu o certificado de exame UE de tipo",
+    text_ppeSubjectToModuleC2:
+      "O EPI está sujeito ao procedimento de avaliação de conformidade baseado no controlo interno da produção e nos controlos supervisionados do produto a intervalos aleatórios (Módulo C2) sob supervisão do organismo notificado",
+    text_ppeSubjectToModuleD:
+      "O EPI está sujeito ao procedimento de avaliação de conformidade baseado na garantia da qualidade do processo de produção (Módulo D) sob supervisão do organismo notificado",
+  },
+  lv: {
+    docTitle: "ES atbilstības deklarācija",
+    categoryLabel: "Kategorija",
+    responsibilityStatement:
+      "Šī atbilstības deklarācija ir izdota vienīgi uz ražotāja atbildību:",
+    manufacturerAddressLabel: "Båstadgruppen AB",
+    ppeLabel:
+      "Ražotājs ar šo paziņo, ka zemāk aprakstītais individuālais aizsardzības līdzeklis (IAL):",
+    ppeNameLabel: "Produkta nosaukums",
+    itemNumberLabel: "ar preces numuru",
+    conformityLegislationLabel:
+      "atbilst attiecīgajiem Savienības saskaņošanas tiesību aktiem:",
+    harmonisedStandardsLabel:
+      "un atbilst II pielikumā noteiktajām piemērojamajām būtiskajām veselības aizsardzības un drošības prasībām un attiecīgajiem saskaņotajiem standartiem vai citām tehniskajām specifikācijām, Nr.:",
+    euCertificateLabel:
+      "ES tipa pārbaudes sertifikāts (B modulis) un izdevis ES tipa pārbaudes sertifikātu Nr.",
+    notifiedBodySectionLabel: "Informācija par paziņoto struktūru",
+    notifiedBodyLabel: "Paziņotās struktūras nosaukums",
+    notifiedBodyNumberLabel: "Paziņotā struktūra Nr.",
+    issuedByLabel: "izdevusi",
+    signatureTitle: "Produktu drošības vadītājs",
+    signatureNamePlaceholder: "Anders Andersson",
+    signatureDateLabel: "Datums",
+    backToFormButton: "Atpakaļ uz veidlapu",
+    downloadPdfButton: "Lejupielādēt PDF",
+    footerWebsite: "www.bastadgruppen.com",
+    footerCompanyName: "Båstadgruppen AB",
+    footerPhoneNumber: "0046123413445",
+    // New Latvian translations
+    simpleCertificateLabel: "Sertifikāts:",
+    text_theNotifiedBody: "Paziņotā struktūra",
+    text_performedEUExam:
+      "veica ES tipa pārbaudi (B modulis) un izsniedza ES tipa pārbaudes sertifikātu",
+    text_ppeSubjectToModuleC2:
+      "IAL ir pakļauts atbilstības novērtēšanas procedūrai, kas balstīta uz iekšējo ražošanas kontroli un uzraudzītām produkta pārbaudēm pēc nejauši izvēlētiem intervāliem (C2 modulis) paziņotās struktūras uzraudzībā",
+    text_ppeSubjectToModuleD:
+      "IAL ir pakļauts atbilstības novērtēšanas procedūrai, kas balstīta uz ražošanas procesa kvalitātes nodrošināšanu (D modulis) paziņotās struktūras uzraudzībā",
+  },
 };
 
 // Function to get translations for a specific language, falling back to English
