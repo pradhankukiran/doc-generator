@@ -15,6 +15,12 @@ import {
 } from "../translations";
 import { notifiedBodies, NotifiedBody } from "../notifiedBodies";
 
+// Import Inter font
+import '@fontsource/inter/400.css';
+import '@fontsource/inter/500.css';
+import '@fontsource/inter/600.css';
+import '@fontsource/inter/700.css';
+
 export function useImage(path: string) {
   const [image, setImage] = useState<string>("");
   const [isLoading, setIsLoading] = useState(true);
@@ -132,7 +138,7 @@ const DocumentPreview = ({
     const contentElement = documentRef.current;
     const contentClone = contentElement.cloneNode(true) as HTMLElement;
     
-    // Apply forced dark text styling
+    // Apply forced dark text styling and Inter font
     const style = document.createElement('style');
     style.innerHTML = `
       * {
@@ -140,10 +146,12 @@ const DocumentPreview = ({
         text-shadow: none !important;
         filter: none !important;
         -webkit-text-stroke: none !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
       }
       p, span, h1, h2, h3, h4, h5, h6, div {
         color: #000 !important;
         opacity: 1 !important;
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif !important;
       }
       img {
         opacity: 1 !important;
@@ -176,6 +184,9 @@ const DocumentPreview = ({
         format: "a4",
       });
       
+      // Define professional margins (in mm)
+      const horizontalMargin = 15; // 15mm margin on left and right
+      
       // Process each language page
       const pages = contentClone.querySelectorAll('.language-page');
       
@@ -198,21 +209,31 @@ const DocumentPreview = ({
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
         
+        // Apply horizontal margins
+        const availableWidth = pageWidth - (2 * horizontalMargin);
+        
         // Calculate the proper scaling to maintain aspect ratio
         const canvasRatio = canvas.width / canvas.height;
-        const pageRatio = pageWidth / pageHeight;
         
-        let imgWidth = pageWidth;
+        // Set the content width to the available width (accounting for margins)
+        let imgWidth = availableWidth;
         let imgHeight = imgWidth / canvasRatio;
         
-        // If height exceeds page height, scale down based on height instead
+        // If height exceeds page height, scale down based on height
         if (imgHeight > pageHeight) {
           imgHeight = pageHeight;
           imgWidth = imgHeight * canvasRatio;
+          // Ensure width doesn't exceed available width
+          if (imgWidth > availableWidth) {
+            imgWidth = availableWidth;
+            imgHeight = imgWidth / canvasRatio;
+          }
         }
         
-        // Center the image on the page
-        const xOffset = (pageWidth - imgWidth) / 2;
+        // Center the image horizontally with the defined margins
+        const xOffset = horizontalMargin + (availableWidth - imgWidth) / 2;
+        
+        // Center vertically
         const yOffset = (pageHeight - imgHeight) / 2;
         
         // Add image to PDF with appropriate scaling and positioning
@@ -231,8 +252,8 @@ const DocumentPreview = ({
     }
   };
 
-  const buttonLang = selectedLanguages[0] || "en";
-  const buttonT = getTranslations(buttonLang);
+  // Use English for UI buttons instead of the first selected language
+  const uiTranslations = getTranslations("en");
 
   return (
     <div className="p-8 bg-surface h-full overflow-auto">
@@ -243,13 +264,13 @@ const DocumentPreview = ({
             className="bg-surface-tertiary text-primary-700 py-2 px-4 rounded-md hover:bg-surface-secondary focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-30 transition-all duration-200 text-sm font-medium flex items-center gap-2 shadow-button"
           >
             <ArrowLeft className="w-4 h-4" />
-            {buttonT.backToFormButton}
+            {uiTranslations.backToFormButton}
           </button>
         </div>
 
         <div
           ref={documentRef}
-          className="flex-grow max-w-2xl min-w-0 print:border-0 print:shadow-none shadow-card bg-white rounded-lg overflow-hidden animate-fade-in print:mx-0 print:max-w-full print:flex-auto"
+          className="flex-grow max-w-2xl min-w-0 print:border-0 print:shadow-none shadow-card bg-white rounded-lg overflow-hidden animate-fade-in print:mx-0 print:max-w-full print:flex-auto font-inter"
         >
           {selectedLanguages.map((lang, index) => {
             const t = getTranslations(lang);
@@ -260,6 +281,7 @@ const DocumentPreview = ({
                 style={{
                   pageBreakBefore: index > 0 ? "always" : "auto",
                   animationDelay: `${index * 100}ms`,
+                  fontFamily: "'Inter', sans-serif",
                 }}
               >
                 <div className="flex justify-end mb-3">
@@ -445,7 +467,7 @@ const DocumentPreview = ({
             className="bg-accent text-white py-2 px-4 rounded-md hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-accent focus:ring-opacity-30 transition-all duration-200 text-sm font-medium flex items-center gap-2 shadow-button hover:shadow-button-hover"
           >
             <Download className="w-4 h-4" />
-            {buttonT.downloadPdfButton}
+            {uiTranslations.downloadPdfButton}
           </button>
         </div>
       </div>
@@ -754,7 +776,7 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
   }
 
   return (
-    <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+    <div className="container max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-10 font-inter">
       {!showPreview ? (
         <form
           onSubmit={generateDoc}
@@ -1280,7 +1302,7 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
       ) : (
         <div className="w-full">
           <div
-            className="bg-white rounded-lg shadow-card border border-border-light overflow-hidden animate-fade-in"
+            className="bg-white rounded-lg shadow-card border border-border-light overflow-hidden animate-fade-in font-inter"
             style={{ minHeight: "calc(100vh - 200px)" }}
           >
             <DocumentPreview
