@@ -198,14 +198,14 @@ const DocumentPreview = ({
         
         // Capture the current page as canvas
         const canvas = await html2canvas(pages[i] as HTMLElement, {
-          scale: 3,
+          scale: 2,
           useCORS: true,
           logging: false,
           backgroundColor: "#ffffff",
         });
         
         // Calculate dimensions to fit A4 while maintaining aspect ratio
-        const imgData = canvas.toDataURL('image/png');
+        const imgData = canvas.toDataURL('image/jpeg', 0.95);
         const pageWidth = pdf.internal.pageSize.getWidth();
         const pageHeight = pdf.internal.pageSize.getHeight();
         
@@ -237,7 +237,7 @@ const DocumentPreview = ({
         const yOffset = (pageHeight - imgHeight) / 2;
         
         // Add image to PDF with appropriate scaling and positioning
-        pdf.addImage(imgData, 'PNG', xOffset, yOffset, imgWidth, imgHeight);
+        pdf.addImage(imgData, 'JPEG', xOffset, yOffset, imgWidth, imgHeight);
       }
       
       // Clean up the temporary element
@@ -504,7 +504,7 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
     categoryClass: "",
     moduleType: "",
     selectedNotifiedBodyId: "",
-    showCertificateNumber: true,
+    showCertificateNumber: false,
   };
 
   const [formData, setFormData] = useState<DocFormData>(() => {
@@ -1188,13 +1188,20 @@ export default function DocForm({ onClearForm }: { onClearForm?: () => void }) {
                     htmlFor="certificateNumber"
                     className="block text-sm font-medium text-primary-800"
                   >
-                    Certificate Number <span className="text-red-500">*</span>
+                    Certificate Number{" "}
+                    {(formData.categoryClass !== "I" ||
+                      formData.showCertificateNumber !== false) && (
+                      <span className="text-red-500">*</span>
+                    )}
                   </label>
                   <input
                     type="text"
                     id="certificateNumber"
                     placeholder="Enter certificate number"
-                    required
+                    required={
+                      formData.categoryClass !== "I" ||
+                      formData.showCertificateNumber !== false
+                    }
                     className={inputClassName}
                     value={formData.certificateNumber}
                     onChange={(e) => handleInputChange(e, "certificateNumber")}
