@@ -463,7 +463,7 @@ const DocumentPreview = ({
                     </p>
                   </div>
 
-                  <div className="text-right text-sm">
+                  <div className="text-right text-sm flex-shrink-0">
                     {showSignature ? (
                       <>
                         <div className="h-9 mb-1 flex justify-end">
