@@ -69,22 +69,22 @@ export const translations: Record<string, Partial<Translations>> = {
     text_ppeSubjectToModuleD: "The PPE is subject to the conformity assessment procedure based on quality assurance of the production process (Module D) under surveillance of the notified body",
   },
   sv: {
-    docTitle: "EU-försäkran om överensstämmelse",
+    docTitle: "EU-förklaring om överensstämmelse",
     categoryLabel: "Kategori",
     responsibilityStatement:
-      "Denna försäkran om överensstämmelse utfärdas på tillverkarens eget ansvar:",
+      "Denna förklaring om överensstämmelse utfärdas på tillverkarens eget ansvar:",
     manufacturerAddressLabel: "Båstadgruppen AB",
     ppeLabel:
-      "Tillverkaren försäkrar härmed att den nedan beskrivna personliga skyddsutrustningen (PPE):",
+      "Tillverkaren förklarar härmed att den nedan beskrivna personliga skyddsutrustningen (PPE):",
     ppeNameLabel: "Produktnamn",
     itemNumberLabel: "med artikelnummer",
     conformityLegislationLabel:
-      "överensstämmer med relevant unionslagstiftning om harmonisering:",
+      "överensstämmer med tillämplig harmoniseringslagstiftning inom unionen:",
     harmonisedStandardsLabel:
-      "och uppfyller de tillämpliga väsentliga hälso- och säkerhetskraven i bilaga II och de relevanta harmoniserade standarderna eller andra tekniska specifikationer, nr:",
-    euCertificateLabel: "EU-typintyg (Modul B) och utfärdade EU-typintyget nr.",
+      "och uppfyller de tillämpliga väsentliga hälso- och säkerhetskraven i bilaga II och de relevanta harmoniserade standarderna eller andra tekniska specifikationer, nr.:",
+    euCertificateLabel: "EU-typprövningscertifikat (Modul B) och utfärdade certifikat nr.",
     notifiedBodySectionLabel: "Information om anmält organ",
-    notifiedBodyLabel: "Anmält organs namn",
+    notifiedBodyLabel: "Namn på anmält organ",
     notifiedBodyNumberLabel: "Anmält organ nr.",
     issuedByLabel: "utfärdat av",
     signatureTitle: "Produktchef Säkerhet",
@@ -99,9 +99,9 @@ export const translations: Record<string, Partial<Translations>> = {
     // New Swedish translations
     simpleCertificateLabel: "Certifikat:",
     text_theNotifiedBody: "Det anmälda organet",
-    text_performedEUExam: "utförde EU-typkontrollen (modul B) och utfärdade EU-typkontrollintyget",
-    text_ppeSubjectToModuleC2: "Den personliga skyddsutrustningen är föremål för förfarandet för bedömning av överensstämmelse baserat på intern tillverkningskontroll plus övervakade produktkontroller med slumpvisa intervaller (modul C2) under övervakning av det anmälda organet",
-    text_ppeSubjectToModuleD: "Den personliga skyddsutrustningen är föremål för förfarandet för bedömning av överensstämmelse baserat på kvalitetssäkring av tillverkningsprocessen (modul D) under övervakning av det anmälda organet",
+    text_performedEUExam: "utförde EU-typprövningen (Modul B) och utfärdade EU-typprövningscertifikat",
+    text_ppeSubjectToModuleC2: "Den personliga skyddsutrustningen omfattas av förfarandet för bedömning av överensstämmelse baserat på intern tillverkningskontroll plus övervakade produktkontroller med slumpvisa intervaller (Modul C2) under övervakning av det anmälda organet",
+    text_ppeSubjectToModuleD: "Den personliga skyddsutrustningen omfattas av förfarandet för bedömning av överensstämmelse baserat på kvalitetssäkring av tillverkningsprocessen (Modul D) under övervakning av det anmälda organet",
   },
   is: {
     docTitle: "ESB-SAMRÆMISYFIRLÝSING",
@@ -147,16 +147,16 @@ export const translations: Record<string, Partial<Translations>> = {
     ppeNameLabel: "Produktnavn",
     itemNumberLabel: "med artikkelnummer",
     conformityLegislationLabel:
-      "er i samsvar med relevant EU-harmoniseringslovgivning:",
+      "er i samsvar med relevant harmoniseringslovgivning i Unionen:",
     harmonisedStandardsLabel:
       "og oppfyller de gjeldende grunnleggende helse- og sikkerhetskrav fastsatt i vedlegg II og de relevante harmoniserte standardene eller andre tekniske spesifikasjoner, nr.:",
     euCertificateLabel:
-      "EU-typeprøvingssertifikat (Modul B) og utstedte EU-typeprøvingssertifikatet nr.",
-    notifiedBodySectionLabel: "Informasjon om teknisk kontrollorgan",
-    notifiedBodyLabel: "Navn på teknisk kontrollorgan",
-    notifiedBodyNumberLabel: "Teknisk kontrollorgan nr.",
+      "EU-typeprøvingssertifikat (Modul B) og utstedte EU-typeprøvingssertifikat nr.",
+    notifiedBodySectionLabel: "Informasjon om notifisert organ",
+    notifiedBodyLabel: "Navn på notifisert organ",
+    notifiedBodyNumberLabel: "Notifisert organ nr.",
     issuedByLabel: "utstedt av",
-    signatureTitle: "Produktsjef Sikkerhet",
+    signatureTitle: "Produktsikkerhetsleder",
     signatureNamePlaceholder: "Anders Andersson",
     signatureDateLabel: "Dato",
     backToFormButton: "Tilbake til skjema",
@@ -166,13 +166,13 @@ export const translations: Record<string, Partial<Translations>> = {
     footerPhoneNumber: "0046123413445",
     // New Norwegian translations
     simpleCertificateLabel: "Sertifikat:",
-    text_theNotifiedBody: "Det tekniske kontrollorganet",
+    text_theNotifiedBody: "Det notifiserte organet",
     text_performedEUExam:
-      "utførte EU-typeprøvingen (Modul B) og utstedte EU-typeprøvingssertifikatet",
+      "utførte EU-typeprøvingen (Modul B) og utstedte EU-typeprøvingssertifikat",
     text_ppeSubjectToModuleC2:
-      "PVU er underlagt samsvarsvurderingsprosedyren basert på intern produksjonskontroll pluss overvåkede produktkontroller med tilfeldige intervaller (Modul C2) under tilsyn av det tekniske kontrollorganet",
+      "PVU er underlagt samsvarsvurderingsprosedyren basert på intern produksjonskontroll pluss overvåkede produktkontroller med tilfeldige intervaller (Modul C2) under tilsyn av det notifiserte organet",
     text_ppeSubjectToModuleD:
-      "PVU er underlagt samsvarsvurderingsprosedyren basert på kvalitetssikring av produksjonsprosessen (Modul D) under tilsyn av det tekniske kontrollorganet",
+      "PVU er underlagt samsvarsvurderingsprosedyren basert på kvalitetssikring av produksjonsprosessen (Modul D) under tilsyn av det notifiserte organet",
   },
   da: {
     docTitle: "EU-overensstemmelseserklæring",
@@ -181,24 +181,24 @@ export const translations: Record<string, Partial<Translations>> = {
       "Denne overensstemmelseserklæring udstedes på fabrikantens eget ansvar:",
     manufacturerAddressLabel: "Båstadgruppen AB",
     ppeLabel:
-      "Fabrikanten erklærer hermed, at følgende personlige værnemiddel (PV):",
+      "Fabrikanten erklærer hermed, at følgende personlige værnemidler (PV):",
     ppeNameLabel: "Produktnavn",
-    itemNumberLabel: "med varenummer",
+    itemNumberLabel: "med artikelnummer",
     conformityLegislationLabel:
-      "er i overensstemmelse med relevant EU-harmoniseringslovgivning:",
+      "er i overensstemmelse med relevant harmoniseringslovgivning i EU:",
     harmonisedStandardsLabel:
       "og opfylder de gældende væsentlige sundheds- og sikkerhedskrav i bilag II og de relevante harmoniserede standarder eller andre tekniske specifikationer, nr.:",
     euCertificateLabel:
-      "EU-typeafprøvningsattest (Modul B) og udstedte EU-typeafprøvningsattesten nr.",
+      "EU-typeafprøvningscertifikat (Modul B) og udstedte EU-typeafprøvningscertifikat nr.",
     notifiedBodySectionLabel: "Oplysninger om bemyndiget organ",
     notifiedBodyLabel: "Navn på bemyndiget organ",
     notifiedBodyNumberLabel: "Bemyndiget organ nr.",
     issuedByLabel: "udstedt af",
-    signatureTitle: "Produktchef Sikkerhed",
+    signatureTitle: "Produktsikkerhedsleder",
     signatureNamePlaceholder: "Anders Andersson",
     signatureDateLabel: "Dato",
-    backToFormButton: "Tilbage til formular",
-    downloadPdfButton: "Download PDF",
+    backToFormButton: "Tilbage til formularen",
+    downloadPdfButton: "Hent PDF",
     footerWebsite: "www.bastadgruppen.com",
     footerCompanyName: "Båstadgruppen AB",
     footerPhoneNumber: "0046123413445",
@@ -206,7 +206,7 @@ export const translations: Record<string, Partial<Translations>> = {
     simpleCertificateLabel: "Certifikat:",
     text_theNotifiedBody: "Det bemyndigede organ",
     text_performedEUExam:
-      "udførte EU-typeafprøvningen (Modul B) og udstedte EU-typeafprøvningsattesten",
+      "udførte EU-typeafprøvningen (Modul B) og udstedte EU-typeafprøvningscertifikat",
     text_ppeSubjectToModuleC2:
       "PV er underlagt overensstemmelsesvurderingsproceduren baseret på intern produktionskontrol plus overvågede produktkontroller med tilfældige intervaller (Modul C2) under tilsyn af det bemyndigede organ",
     text_ppeSubjectToModuleD:
@@ -514,7 +514,7 @@ export const translations: Record<string, Partial<Translations>> = {
     text_ppeSubjectToModuleC2:
       "O EPI está sujeito ao procedimento de avaliação de conformidade baseado no controlo interno da produção e nos controlos supervisionados do produto a intervalos aleatórios (Módulo C2) sob supervisão do organismo notificado",
     text_ppeSubjectToModuleD:
-      "O EPI está sujeito ao procedimento de avaliação de conformidade baseado na garantia da qualitade do processo de produção (Módulo D) sob supervisão do organismo notificado",
+      "O EPI está sujeito ao procedimento de avaliação de conformidade baseado na garantia da qualidade do processo de produção (Módulo D) sob supervisão do organismo notificado",
   },
   lv: {
     docTitle: "ES atbilstības deklarācija",
@@ -549,8 +549,8 @@ export const translations: Record<string, Partial<Translations>> = {
     text_theNotifiedBody: "Paziņotā struktūra",
     text_performedEUExam:
       "veica ES tipa pārbaudi (B modulis) un izsniedza ES tipa pārbaudes sertifikātu",
-    text_ppeSubjectToModuleC2: "IAL ir pakļauts atbilstības novērtēšanas procedūrai, kas balstīta uz iekšējo ražošanas kontroli un uzraudzītām produkta pārbaudēm pēc nejauši izvēlētiem intervāliem (C2 modulis) paziņotās struktūras uzraudzībā",
-    text_ppeSubjectToModuleD: "IAL ir pakļauts atbilstības novērtēšanas procedūrai, kas balstīta uz ražošanas procesa kvalitātes nodrošināšanu (D modulis) paziņotās struktūras uzraudzībā",
+    text_ppeSubjectToModuleC2: "IAL ir pakļauts atbilstības novērtēšanas procedūrai (C2 modulis) paziņotās struktūras uzraudzībā",
+    text_ppeSubjectToModuleD: "IAL ir pakļauts atbilstības novērtēšanas procedūrai (D modulis) paziņotās struktūras uzraudzībā",
   },
   es: {
     docTitle: "Declaración de conformidad UE",
@@ -744,7 +744,7 @@ export const translations: Record<string, Partial<Translations>> = {
     signatureTitle: "Διευθυντής Ασφάλειας Προϊόντων",
     signatureNamePlaceholder: "Anders Andersson",
     signatureDateLabel: "Ημερομηνία",
-    backToFormButton: "Πίσω στη φόρma",
+    backToFormButton: "Πίσω στη φόρμα",
     downloadPdfButton: "Λήψη PDF",
     footerWebsite: "www.bastadgruppen.com",
     footerCompanyName: "Båstadgruppen AB",

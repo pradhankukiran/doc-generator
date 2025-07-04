@@ -80,6 +80,7 @@ const DocumentPreview = ({
   const documentRef = useRef<HTMLDivElement>(null);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [isGeneratingPreview, setIsGeneratingPreview] = useState(true);
+  const [pdfGenerationKey, setPdfGenerationKey] = useState(0);
   const [numPages, setNumPages] = useState<number>(0);
 
   const signatureMap: Record<string, { file: string; name: string }> = {
@@ -91,7 +92,7 @@ const DocumentPreview = ({
   };
 
   const signatureData = formData.brandName
-    ? signatureMap[formData.brandName]
+    ? signatureMap[formData.brandName] || null
     : null;
 
   const {
@@ -107,7 +108,7 @@ const DocumentPreview = ({
     window.print();
   };
 
-  const generatePdf = useCallback(async (outputType: 'bloburl' | 'save') => {
+  const generatePdf = useCallback(async (outputType: 'bloburl' | 'save'): Promise<string | null> => {
     if (!documentRef.current) return;
 
     // First apply high contrast styling to ensure dark text
@@ -221,41 +222,60 @@ const DocumentPreview = ({
       
       if (outputType === 'save') {
         pdf.save(filename);
+        return null;
       } else {
-        return pdf.output('bloburl');
+        return pdf.output('bloburl') as string;
       }
       
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Failed to generate PDF. Please try again.');
+      return null;
     }
-    return null;
   }, [formData]);
 
   useEffect(() => {
     const generatePreview = async () => {
+      setIsGeneratingPreview(true);
+      // Cleanup previous PDF URL to prevent memory leaks
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl.replace('#toolbar=0', ''));
+        setPdfUrl(null);
+      }
+      
       // A brief delay to allow the hidden content to render fully
       await new Promise(resolve => setTimeout(resolve, 300));
       const url = await generatePdf('bloburl');
       if (url) {
-        setPdfUrl(`${url.toString()}#toolbar=0`);
+        setPdfUrl(`${String(url)}#toolbar=0`);
       }
       setIsGeneratingPreview(false);
     };
 
     generatePreview();
-  }, [generatePdf]);
+    
+    // Cleanup function to revoke blob URL on unmount
+    return () => {
+      if (pdfUrl) {
+        URL.revokeObjectURL(pdfUrl.replace('#toolbar=0', ''));
+      }
+    };
+  }, [pdfGenerationKey]); // Changed dependency to prevent excessive regeneration
+
+  // Trigger PDF regeneration when form data or selected languages change
+  useEffect(() => {
+    setPdfGenerationKey(prev => prev + 1);
+  }, [formData, selectedLanguages]);
 
   const handleDownloadPDF = useCallback(async () => {
     await generatePdf('save');
   }, [generatePdf]);
 
   useEffect(() => {
-    // @ts-ignore
-    window.__downloadPDF = handleDownloadPDF;
+    // Extend window interface for download PDF function
+    (window as any).__downloadPDF = handleDownloadPDF;
     return () => {
-      // @ts-ignore
-      delete window.__downloadPDF;
+      delete (window as any).__downloadPDF;
     };
   }, [handleDownloadPDF]);
 
@@ -479,12 +499,14 @@ const DocumentPreview = ({
                       </>
                     ) : (
                       <>
-                        <div className="h-9 mb-1"></div>
-                        <p className="mb-1">{t.signatureTitle}</p>
-                        <p className="mb-1">
-                          {signatureData?.name || t.signatureNamePlaceholder}
-                        </p>
-                        <p>{formatDate(new Date())}</p>
+                        {signatureData && (
+                          <>
+                            <div className="h-9 mb-1"></div>
+                            <p className="mb-1">{t.signatureTitle}</p>
+                            <p className="mb-1">&nbsp;</p>
+                            <p>{formatDate(new Date())}</p>
+                          </>
+                        )}
                       </>
                     )}
                   </div>
