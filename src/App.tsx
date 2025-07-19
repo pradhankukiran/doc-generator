@@ -33,6 +33,13 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-primary-50 to-primary-100">
+      {location.pathname === '/' && (
+        <div className="top-banner">
+          <a href="https://doc-bastadgruppen.vercel.app/" target="_blank" rel="noopener noreferrer">
+            Try the new DoC generator here made by the same rockstar dev.
+          </a>
+        </div>
+      )}
       <header className="bg-primary-100 shadow-subtle">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <h1 className="text-xl font-display font-semibold text-primary-900">Declaration of Conformity</h1>
