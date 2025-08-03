@@ -36,7 +36,7 @@ function AppContent() {
       {location.pathname === '/' && (
         <div className="top-banner">
           <a href="https://doc-bastadgruppen.vercel.app/" target="_blank" rel="noopener noreferrer">
-            Try the new DoC generator here made by the same rockstar dev.
+            Try the new & better DoC generator here made by the same rockstar dev.
           </a>
         </div>
       )}
